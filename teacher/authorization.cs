@@ -16,6 +16,7 @@ namespace teacher
     {
         bool allowClose = false;
         string language = "ru";
+        string allarmCloseText;
         public authorization()
         {
             InitializeComponent();
@@ -54,9 +55,11 @@ namespace teacher
             switch (language)
             {
                 case "ru":
+                    allarmCloseText = "Программу нельзя закрыть";
                     button_login.Text = "Войти";
                     break;
                 case "en":
+                    allarmCloseText = "You can't close this app";
                     button_login.Text = "Login";
                     break;
             }
@@ -66,10 +69,10 @@ namespace teacher
             switch (language)
             {
                 case "ru":
-                    MessageBox.Show("Программу нельзя закрыть");
+                    MessageBox.Show(allarmCloseText);
                     break;
                 case "en":
-                    MessageBox.Show("You can't close this app");
+                    MessageBox.Show(allarmCloseText);
                     break;
             }
         }
@@ -116,6 +119,20 @@ namespace teacher
             {
                 allowClose = !allowClose;
             }
+        }
+
+        private void allButton_White()
+        {
+            button_language_EN.BackColor = Color.White;
+            button_language_RU.BackColor = Color.White;
+        }
+
+        private void button_language_RU_Click(object sender, EventArgs e)
+        {
+            allButton_White();
+            button_language_RU.BackColor = Color.Red;
+            language = "ru";
+            setLanguage();
         }
     }
 }

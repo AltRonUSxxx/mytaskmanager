@@ -39,6 +39,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.button_login = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.button_language_RU = new System.Windows.Forms.Button();
+            this.button_language_EN = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_uppestPanel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -129,7 +131,7 @@
             this.button_login.ForeColor = System.Drawing.Color.White;
             this.button_login.Location = new System.Drawing.Point(141, 449);
             this.button_login.Name = "button_login";
-            this.button_login.Size = new System.Drawing.Size(115, 43);
+            this.button_login.Size = new System.Drawing.Size(120, 50);
             this.button_login.TabIndex = 9;
             this.button_login.Text = "Войти";
             this.button_login.UseVisualStyleBackColor = false;
@@ -148,12 +150,35 @@
             this.label2.Text = "X";
             this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
+            // button_language_RU
+            // 
+            this.button_language_RU.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button_language_RU.Location = new System.Drawing.Point(151, 519);
+            this.button_language_RU.Name = "button_language_RU";
+            this.button_language_RU.Size = new System.Drawing.Size(40, 40);
+            this.button_language_RU.TabIndex = 11;
+            this.button_language_RU.Text = "РУ";
+            this.button_language_RU.UseVisualStyleBackColor = true;
+            this.button_language_RU.Click += new System.EventHandler(this.button_language_RU_Click);
+            // 
+            // button_language_EN
+            // 
+            this.button_language_EN.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.button_language_EN.Location = new System.Drawing.Point(197, 519);
+            this.button_language_EN.Name = "button_language_EN";
+            this.button_language_EN.Size = new System.Drawing.Size(40, 40);
+            this.button_language_EN.TabIndex = 12;
+            this.button_language_EN.Text = "EN";
+            this.button_language_EN.UseVisualStyleBackColor = true;
+            // 
             // authorization
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(400, 600);
+            this.Controls.Add(this.button_language_EN);
+            this.Controls.Add(this.button_language_RU);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.button_login);
             this.Controls.Add(this.label1);
@@ -194,6 +219,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button_login;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button button_language_RU;
+        private System.Windows.Forms.Button button_language_EN;
     }
 }
 
