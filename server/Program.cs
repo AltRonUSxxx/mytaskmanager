@@ -25,13 +25,25 @@ namespace server
             int clientId = 0;
             while (true)
             {
-                Thread newClient = Thread(() => receiverWork());
+                Socket newClient = server.Accept();
+                Thread receiver = new Thread(() => receiverWork(newClient, clientId));
+                clientId++;
             }
         }
 
-        private void receiverWork(Socket client, int id)
+        private static void receiverWork(Socket client, int id)
         {
+            try
+            {
+                while (true)
+                {
 
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }
