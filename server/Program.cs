@@ -35,9 +35,21 @@ namespace server
         {
             try
             {
+                byte[] buffer = new byte[1024];
+                int bytesReceived = 0;
+                string message;
                 while (true)
                 {
-
+                    bytesReceived = client.Receive(buffer);
+                    message = Encoding.UTF8.GetString(buffer, 0, bytesReceived);
+                    string[] requests = message.Split(' ');
+                    switch(requests[0])
+                    {
+                        case "01":
+                            string username = requests[1];
+                            string password = requests[2];
+                            break;
+                    }
                 }
             }
             catch (Exception ex)
