@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Net.Sockets;
+using System.Net;
 
 namespace teacher
 {
@@ -22,10 +23,13 @@ namespace teacher
         private string fillNeadableText;
         private string useOnlyLetterAndNumber;
         private string dontUseSpace;
+        private string NotMoreThan;
         private Socket client;
+        private IPEndPoint endPoint;
 
         public authorization()
         {
+            endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8080);
             InitializeComponent();
             setLanguage();
             button_language_RU.BackColor = Color.Gray;
@@ -44,7 +48,6 @@ namespace teacher
                 SocketType.Stream,
                 ProtocolType.Tcp
                 );
-            
         }
 
         private void Taskmgr_killer_DoWork(object sender, DoWorkEventArgs e)
@@ -80,6 +83,7 @@ namespace teacher
                     fillNeadableText = "Заполните поля";
                     useOnlyLetterAndNumber = "Используйте только буквы и цифры для имени пользователя";
                     dontUseSpace = "Не используйте пробелы";
+                    NotMoreThan = "Длина не больше 32 символовов";
                     break;
                 case "en":
                     allarmCloseText = "You can't close this app";
@@ -87,6 +91,7 @@ namespace teacher
                     fillNeadableText = "Fill in the text";
                     useOnlyLetterAndNumber = "Use only letter and number for username";
                     dontUseSpace = "Don't use space";
+                    NotMoreThan = "Lenght no more than 32 characters";
                     break;
             }
         }
@@ -193,6 +198,11 @@ namespace teacher
 
         private bool check_validation()
         {
+            if(textBox_password.Text.Length > 32 || textBox_username.Text.Length > 32)
+            {
+                MessageBox.Show(NotMoreThan);
+                return false;
+            }
             if (string.IsNullOrEmpty(textBox_password.Text) || string.IsNullOrEmpty(textBox_username.Text))
             {
                 MessageBox.Show(fillNeadableText);
@@ -218,7 +228,9 @@ namespace teacher
         {
             if (check_validation())
             {
-
+                client.Connect(endPoint);
+                string message = $"{textBox_username.Text} {textBox_password.Text}";
+                byte
             }
         }
 
