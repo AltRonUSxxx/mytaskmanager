@@ -15,18 +15,23 @@ namespace teacher
 {
     public partial class authorization : Form
     {
-        bool allowClose = false;
-        string language = "ru";
-        string allarmCloseText;
+        private bool allowClose = false;
+        private string language = "ru";
+        private string allarmCloseText;
+        private string fillNeadableText;
+        private string useOnlyLetterAndNumber;
+        private string dontUseSpace;
+
         public authorization()
         {
             InitializeComponent();
             setLanguage();
-            button_language_RU.BackColor = Color.Red;
+            button_language_RU.BackColor = Color.Gray;
 
             BackgroundWorker Taskmgr_killer = new BackgroundWorker();
             Taskmgr_killer.DoWork += Taskmgr_killer_DoWork;
             Taskmgr_killer.RunWorkerAsync();
+
         }
 
         private void authorization_Load(object sender, EventArgs e)
@@ -64,10 +69,16 @@ namespace teacher
                 case "ru":
                     allarmCloseText = "Программу нельзя закрыть";
                     button_login.Text = "Войти";
+                    fillNeadableText = "Заполните поля";
+                    useOnlyLetterAndNumber = "Используйте только буквы и цифры для имени пользователя";
+                    dontUseSpace = "Не используйте пробелы";
                     break;
                 case "en":
                     allarmCloseText = "You can't close this app";
                     button_login.Text = "Login";
+                    fillNeadableText = "Fill in the text";
+                    useOnlyLetterAndNumber = "Use only letter and number for username";
+                    dontUseSpace = "Don't use space";
                     break;
             }
         }
@@ -140,7 +151,7 @@ namespace teacher
         private void button_language_RU_Click(object sender, EventArgs e)
         {
             allButton_White();
-            button_language_RU.BackColor = Color.Red;
+            button_language_RU.BackColor = Color.Gray;
             button_language_RU.ForeColor = Color.White;
             language = "ru";
             setLanguage();
@@ -149,7 +160,7 @@ namespace teacher
         private void button_language_EN_Click(object sender, EventArgs e)
         {
             allButton_White();
-            button_language_EN.BackColor = Color.Red;
+            button_language_EN.BackColor = Color.Gray;
             button_language_EN.ForeColor = Color.White;
             language = "en";
             setLanguage();
@@ -170,6 +181,42 @@ namespace teacher
 
             path.CloseFigure();
             this.Region = new Region(path);
+        }
+
+        private bool check_validation()
+        {
+            if (string.IsNullOrEmpty(textBox_password.Text) || string.IsNullOrEmpty(textBox_username.Text))
+            {
+                MessageBox.Show(fillNeadableText);
+                return false;
+            }
+            foreach (char k in textBox_username.Text)
+            {
+                if (!Char.IsLetterOrDigit(k))
+                {
+                    MessageBox.Show(useOnlyLetterAndNumber);
+                    return false;
+                }
+            }
+            if (textBox_password.Text.Contains(' ') || textBox_username.Text.Contains(' '))
+            {
+                MessageBox.Show(dontUseSpace);
+                return false;
+            }
+            return true;
+        }
+
+        private void login()
+        {
+            if (check_validation())
+            {
+
+            }
+        }
+
+        private void button_login_Click(object sender, EventArgs e)
+        {
+            login();
         }
     }
 }

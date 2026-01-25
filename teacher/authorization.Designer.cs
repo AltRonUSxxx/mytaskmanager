@@ -57,7 +57,7 @@
             this.pictureBox_uppestPanel.BackColor = System.Drawing.SystemColors.Control;
             this.pictureBox_uppestPanel.Location = new System.Drawing.Point(0, 0);
             this.pictureBox_uppestPanel.Name = "pictureBox_uppestPanel";
-            this.pictureBox_uppestPanel.Size = new System.Drawing.Size(400, 50);
+            this.pictureBox_uppestPanel.Size = new System.Drawing.Size(400, 38);
             this.pictureBox_uppestPanel.TabIndex = 1;
             this.pictureBox_uppestPanel.TabStop = false;
             this.pictureBox_uppestPanel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_uppestPanel_MouseDown);
@@ -66,10 +66,9 @@
             // textBox_username
             // 
             this.textBox_username.Font = new System.Drawing.Font("Comic Sans MS", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.textBox_username.Location = new System.Drawing.Point(123, 283);
-            this.textBox_username.Multiline = true;
+            this.textBox_username.Location = new System.Drawing.Point(123, 297);
             this.textBox_username.Name = "textBox_username";
-            this.textBox_username.Size = new System.Drawing.Size(190, 51);
+            this.textBox_username.Size = new System.Drawing.Size(190, 37);
             this.textBox_username.TabIndex = 2;
             // 
             // pictureBox4
@@ -93,11 +92,10 @@
             // textBox_password
             // 
             this.textBox_password.Font = new System.Drawing.Font("Comic Sans MS", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.textBox_password.Location = new System.Drawing.Point(123, 363);
-            this.textBox_password.Multiline = true;
+            this.textBox_password.Location = new System.Drawing.Point(123, 377);
             this.textBox_password.Name = "textBox_password";
             this.textBox_password.PasswordChar = '*';
-            this.textBox_password.Size = new System.Drawing.Size(190, 51);
+            this.textBox_password.Size = new System.Drawing.Size(190, 37);
             this.textBox_password.TabIndex = 4;
             // 
             // pictureBox2
@@ -139,6 +137,7 @@
             this.button_login.TabIndex = 9;
             this.button_login.Text = "Войти";
             this.button_login.UseVisualStyleBackColor = false;
+            this.button_login.Click += new System.EventHandler(this.button_login_Click);
             // 
             // label2
             // 
