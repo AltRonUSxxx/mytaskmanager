@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Drawing2D;
+using System.Net.Sockets;
 
 namespace teacher
 {
@@ -21,6 +22,7 @@ namespace teacher
         private string fillNeadableText;
         private string useOnlyLetterAndNumber;
         private string dontUseSpace;
+        private Socket client;
 
         public authorization()
         {
@@ -36,6 +38,12 @@ namespace teacher
 
         private void authorization_Load(object sender, EventArgs e)
         {
+            client = new Socket
+                (
+                AddressFamily.InterNetwork,
+                SocketType.Stream,
+                ProtocolType.Tcp
+                );
             
         }
 
