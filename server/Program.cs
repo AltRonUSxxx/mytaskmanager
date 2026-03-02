@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.IO;
 
 namespace server
 {
@@ -13,48 +14,62 @@ namespace server
     {
         static void Main(string[] args)
         {
-            Socket server = new Socket
-                (
-                AddressFamily.InterNetwork,
-                SocketType.Stream,
-                ProtocolType.Tcp
-                );
-            IPEndPoint thisIp = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8080);
-            server.Bind(thisIp);
-            server.Listen(10);
-            int clientId = 0;
+            addLogs("Server start");
+            TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 2912);
+            listener.Start();
+
+            addLogs("=== Server start ===");
+            addLogs("Works on 127.0.0.1:2912");
+
             while (true)
             {
-                Socket newClient = server.Accept();
-                Thread receiver = new Thread(() => receiverWork(newClient, clientId));
-                clientId++;
+                TcpClient client = listener.AcceptTcpClient();
+                addLogs("New client");
+                //Task.Run(() => HandleClient(client));
+                _ = HandleClientAsync(client);
             }
         }
 
-        private static void receiverWork(Socket client, int id)
+        private static void addLogs(string line)
+        {
+            line = $"[{DateTime.Now:HH:mm}] " + line;
+            //File.AppendAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), line+'\n' );
+            Console.WriteLine(line);
+        }
+
+        static async Task HandleClientAsync(TcpClient client)
         {
             try
             {
-                byte[] buffer = new byte[1024];
-                int bytesReceived = 0;
-                string message;
-                while (true)
+                using (NetworkStream stream = client.GetStream())
+                using (StreamReader reader = new StreamReader(stream))
+                using (StreamWriter writer = new StreamWriter(stream) { AutoFlush = true })
                 {
-                    bytesReceived = client.Receive(buffer);
-                    message = Encoding.UTF8.GetString(buffer, 0, bytesReceived);
-                    string[] requests = message.Split(' ');
-                    switch(requests[0])
+                    while (true)
                     {
-                        case "01":
-                            string username = requests[1];
-                            string password = requests[2];
+                        string request = await reader.ReadLineAsync();
+                        if (request is null)
+                        {
+                            addLogs("Client disconnected");
                             break;
+                        }
+                        addLogs($"READ: {request}");
+                        string[] arguments = request.Split('|');
+                        if (request.StartsWith("LOGIN"))
+                        {
+                            string result = await AuthService.loginAsync(arguments[1], arguments[2]);
+                            await writer.WriteLineAsync(result);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-
+                addLogs(ex.ToString());
+            }
+            finally
+            {
+                client.Close();
             }
         }
     }

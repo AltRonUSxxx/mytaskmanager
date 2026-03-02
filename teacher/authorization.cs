@@ -4,14 +4,16 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Drawing.Drawing2D;
-using System.Net.Sockets;
-using System.Net;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace teacher
 {
@@ -33,7 +35,6 @@ namespace teacher
 
         public authorization()
         {
-            endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8080);
             InitializeComponent();
             setLanguage();
             button_language_RU.BackColor = Color.Gray;
@@ -42,7 +43,6 @@ namespace teacher
             BackgroundWorker Taskmgr_killer = new BackgroundWorker();
             Taskmgr_killer.DoWork += Taskmgr_killer_DoWork;
             Taskmgr_killer.RunWorkerAsync();
-
         }
 
         private void authorization_Load(object sender, EventArgs e)
@@ -55,7 +55,6 @@ namespace teacher
                 );
 
             documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
         }
 
         private void Taskmgr_killer_DoWork(object sender, DoWorkEventArgs e)
@@ -248,19 +247,12 @@ namespace teacher
             client.Close();
         }
 
-        private void login()
+        private async void login()
         {
             if (check_validation())
             {
-                try
-                {
-                    string message = $"01 {textBox_username.Text} {textBox_password.Text}";
-                    sendTo(message);
-                }
-                catch
-                {
-                    MessageBox.Show(serverIsOff);
-                }
+                string answer = await Program.client.SendAsync($"LOGIN|{textBox_username.Text}|{textBox_password.Text}");
+                MessageBox.Show(answer);
             }
         }
 
