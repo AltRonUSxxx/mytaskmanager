@@ -11,8 +11,17 @@
           </Key>
           <Property Name="id" Type="int" Nullable="false" />
           <Property Name="user_id" Type="int" Nullable="false" />
-          <Property Name="date" Type="datetime" Nullable="false" />
-          <Property Name="lesson_id" Type="int" Nullable="false" />
+          <Property Name="date" Type="datetime" />
+        </EntityType>
+        <EntityType Name="fullnames">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="lastname" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="middlename" Type="nvarchar" MaxLength="255" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
         <EntityType Name="lessons">
           <Key>
@@ -58,18 +67,6 @@
           <Property Name="securityLvl_id" Type="int" Nullable="false" />
           <Property Name="email" Type="nvarchar" MaxLength="100" Nullable="false" />
         </EntityType>
-        <Association Name="FK_attentions_lessons">
-          <End Role="lessons" Type="Self.lessons" Multiplicity="1" />
-          <End Role="attentions" Type="Self.attentions" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="lessons">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="attentions">
-              <PropertyRef Name="lesson_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_attentions_users">
           <End Role="users" Type="Self.users" Multiplicity="1" />
           <End Role="attentions" Type="Self.attentions" Multiplicity="*" />
@@ -78,6 +75,18 @@
               <PropertyRef Name="id" />
             </Principal>
             <Dependent Role="attentions">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_fullnames_users">
+          <End Role="users" Type="Self.users" Multiplicity="1" />
+          <End Role="fullnames" Type="Self.fullnames" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="fullnames">
               <PropertyRef Name="user_id" />
             </Dependent>
           </ReferentialConstraint>
@@ -120,18 +129,19 @@
         </Association>
         <EntityContainer Name="teacher_studentModelStoreContainer">
           <EntitySet Name="attentions" EntityType="Self.attentions" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="fullnames" EntityType="Self.fullnames" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="lessons" EntityType="Self.lessons" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="security_roles" EntityType="Self.security_roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="status" EntityType="Self.status" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="users" EntityType="Self.users" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_attentions_lessons" Association="Self.FK_attentions_lessons">
-            <End Role="lessons" EntitySet="lessons" />
-            <End Role="attentions" EntitySet="attentions" />
-          </AssociationSet>
           <AssociationSet Name="FK_attentions_users" Association="Self.FK_attentions_users">
             <End Role="users" EntitySet="users" />
             <End Role="attentions" EntitySet="attentions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_fullnames_users" Association="Self.FK_fullnames_users">
+            <End Role="users" EntitySet="users" />
+            <End Role="fullnames" EntitySet="fullnames" />
           </AssociationSet>
           <AssociationSet Name="FK_lessons_status" Association="Self.FK_lessons_status">
             <End Role="status" EntitySet="status" />
@@ -157,10 +167,19 @@
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" />
           <Property Name="user_id" Type="Int32" Nullable="false" />
-          <Property Name="date" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="lesson_id" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="lesson" Relationship="Self.FK_attentions_lessons" FromRole="attentions" ToRole="lessons" />
+          <Property Name="date" Type="DateTime" Precision="3" />
           <NavigationProperty Name="user" Relationship="Self.FK_attentions_users" FromRole="attentions" ToRole="users" />
+        </EntityType>
+        <EntityType Name="fullname">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="lastname" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="middlename" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="user" Relationship="Self.FK_fullnames_users" FromRole="fullnames" ToRole="users" />
         </EntityType>
         <EntityType Name="lesson">
           <Key>
@@ -171,7 +190,6 @@
           <Property Name="date" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="theme" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="status_id" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="attentions" Relationship="Self.FK_attentions_lessons" FromRole="lessons" ToRole="attentions" />
           <NavigationProperty Name="status" Relationship="Self.FK_lessons_status" FromRole="lessons" ToRole="status" />
           <NavigationProperty Name="user" Relationship="Self.FK_lessons_users" FromRole="lessons" ToRole="users" />
         </EntityType>
@@ -211,21 +229,10 @@
           <Property Name="securityLvl_id" Type="Int32" Nullable="false" />
           <Property Name="email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="attentions" Relationship="Self.FK_attentions_users" FromRole="users" ToRole="attentions" />
+          <NavigationProperty Name="fullnames" Relationship="Self.FK_fullnames_users" FromRole="users" ToRole="fullnames" />
           <NavigationProperty Name="lessons" Relationship="Self.FK_lessons_users" FromRole="users" ToRole="lessons" />
           <NavigationProperty Name="security_roles" Relationship="Self.FK_users_security_roles" FromRole="users" ToRole="security_roles" />
         </EntityType>
-        <Association Name="FK_attentions_lessons">
-          <End Role="lessons" Type="Self.lesson" Multiplicity="1" />
-          <End Role="attentions" Type="Self.attention" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="lessons">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="attentions">
-              <PropertyRef Name="lesson_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_attentions_users">
           <End Role="users" Type="Self.user" Multiplicity="1" />
           <End Role="attentions" Type="Self.attention" Multiplicity="*" />
@@ -234,6 +241,18 @@
               <PropertyRef Name="id" />
             </Principal>
             <Dependent Role="attentions">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_fullnames_users">
+          <End Role="users" Type="Self.user" Multiplicity="1" />
+          <End Role="fullnames" Type="Self.fullname" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="fullnames">
               <PropertyRef Name="user_id" />
             </Dependent>
           </ReferentialConstraint>
@@ -276,18 +295,19 @@
         </Association>
         <EntityContainer Name="teacher_studentEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="attentions" EntityType="Self.attention" />
+          <EntitySet Name="fullnames" EntityType="Self.fullname" />
           <EntitySet Name="lessons" EntityType="Self.lesson" />
           <EntitySet Name="security_roles" EntityType="Self.security_roles" />
           <EntitySet Name="status" EntityType="Self.status" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
           <EntitySet Name="users" EntityType="Self.user" />
-          <AssociationSet Name="FK_attentions_lessons" Association="Self.FK_attentions_lessons">
-            <End Role="lessons" EntitySet="lessons" />
-            <End Role="attentions" EntitySet="attentions" />
-          </AssociationSet>
           <AssociationSet Name="FK_attentions_users" Association="Self.FK_attentions_users">
             <End Role="users" EntitySet="users" />
             <End Role="attentions" EntitySet="attentions" />
+          </AssociationSet>
+          <AssociationSet Name="FK_fullnames_users" Association="Self.FK_fullnames_users">
+            <End Role="users" EntitySet="users" />
+            <End Role="fullnames" EntitySet="fullnames" />
           </AssociationSet>
           <AssociationSet Name="FK_lessons_status" Association="Self.FK_lessons_status">
             <End Role="status" EntitySet="status" />
@@ -314,7 +334,17 @@
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="date" ColumnName="date" />
-                <ScalarProperty Name="lesson_id" ColumnName="lesson_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="fullnames">
+            <EntityTypeMapping TypeName="teacher_studentModel.fullname">
+              <MappingFragment StoreEntitySet="fullnames">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="lastname" ColumnName="lastname" />
+                <ScalarProperty Name="middlename" ColumnName="middlename" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

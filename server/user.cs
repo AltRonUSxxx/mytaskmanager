@@ -18,6 +18,7 @@ namespace server
         public user()
         {
             this.attentions = new HashSet<attention>();
+            this.fullnames = new HashSet<fullname>();
             this.lessons = new HashSet<lesson>();
         }
     
@@ -29,6 +30,8 @@ namespace server
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<attention> attentions { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<fullname> fullnames { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<lesson> lessons { get; set; }
         public virtual security_roles security_roles { get; set; }

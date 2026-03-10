@@ -12,11 +12,13 @@ namespace server
     using System;
     using System.Collections.Generic;
     
-    public partial class attention
+    public partial class fullname
     {
-        public int id { get; set; }
+        public string name { get; set; }
+        public string lastname { get; set; }
+        public string middlename { get; set; }
         public int user_id { get; set; }
-        public Nullable<System.DateTime> date { get; set; }
+        public int id { get; set; }
     
         public virtual user user { get; set; }
     }

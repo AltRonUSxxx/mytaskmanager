@@ -33,12 +33,15 @@ namespace teacher
 
         private string documentsPath;
 
+        private FormWinLocker winLocker;
         public authorization()
         {
             InitializeComponent();
             setLanguage();
             button_language_RU.BackColor = Color.Gray;
+            winLocker = new FormWinLocker();
 
+            ShowInTaskbar = false;
 
             BackgroundWorker Taskmgr_killer = new BackgroundWorker();
             Taskmgr_killer.DoWork += Taskmgr_killer_DoWork;
@@ -47,14 +50,10 @@ namespace teacher
 
         private void authorization_Load(object sender, EventArgs e)
         {
-            client = new Socket
-                (
-                AddressFamily.InterNetwork,
-                SocketType.Stream,
-                ProtocolType.Tcp
-                );
-
             documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            this.Owner = winLocker;
+            winLocker.Show();
+            TopMost = true;
         }
 
         private void Taskmgr_killer_DoWork(object sender, DoWorkEventArgs e)
@@ -106,15 +105,7 @@ namespace teacher
         }
         private void alarmClose()
         {
-            switch (language)
-            {
-                case "ru":
-                    MessageBox.Show(allarmCloseText);
-                    break;
-                case "en":
-                    MessageBox.Show(allarmCloseText);
-                    break;
-            }
+            MessageBox.Show(allarmCloseText);
         }
 
         private void label2_Click(object sender, EventArgs e)
@@ -233,25 +224,16 @@ namespace teacher
             return true;
         }
 
-        private void sendTo(string line)
-        {
-            Thread thread = new Thread(() => senderWorks(line));
-            thread.Start();
-        }
-
-        private void senderWorks(string message)
-        {
-            client.Connect(endPoint);
-            byte[] messageData = Encoding.UTF8.GetBytes(message);
-            client.Send(messageData, SocketFlags.None);
-            client.Close();
-        }
-
         private async void login()
         {
             if (check_validation())
             {
                 string answer = await Program.client.SendAsync($"LOGIN|{textBox_username.Text}|{textBox_password.Text}");
+                if(answer.StartsWith("SUCCESS"))
+                {
+                    winLocker.Hide();
+                    this.Hide();
+                }
                 MessageBox.Show(answer);
             }
         }
@@ -259,6 +241,13 @@ namespace teacher
         private void button_login_Click(object sender, EventArgs e)
         {
             login();
+        }
+
+        private void authorization_Deactivate(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            this.Activate();
+            this.Focus();
         }
     }
 }

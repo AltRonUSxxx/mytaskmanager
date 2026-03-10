@@ -14,20 +14,12 @@ namespace server
     
     public partial class lesson
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public lesson()
-        {
-            this.attentions = new HashSet<attention>();
-        }
-    
         public int id { get; set; }
         public int user_id { get; set; }
         public System.DateTime date { get; set; }
         public string theme { get; set; }
         public int status_id { get; set; }
     
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<attention> attentions { get; set; }
         public virtual status status { get; set; }
         public virtual user user { get; set; }
     }

@@ -26,6 +26,7 @@ namespace server
         }
     
         public virtual DbSet<attention> attentions { get; set; }
+        public virtual DbSet<fullname> fullnames { get; set; }
         public virtual DbSet<lesson> lessons { get; set; }
         public virtual DbSet<security_roles> security_roles { get; set; }
         public virtual DbSet<status> status { get; set; }

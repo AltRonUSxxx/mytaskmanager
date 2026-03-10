@@ -22,20 +22,6 @@ public class ServerConnection
         _writer = new StreamWriter(stream) { AutoFlush = true };
     }
 
-    public void Connect()
-    {
-        _client = new TcpClient("127.0.0.1", 2912);
-        var stream = _client.GetStream();
-        _reader = new StreamReader(stream);
-        _writer = new StreamWriter(stream) { AutoFlush = true };
-    }
-
-    public string Send(string message)
-    {
-        _writer.WriteLine(message);
-        return _reader.ReadLine();
-    }
-
     public async Task<string> SendAsync(string message)
     {
         await _writer.WriteLineAsync(message);

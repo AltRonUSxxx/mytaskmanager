@@ -219,6 +219,7 @@
             this.Name = "authorization";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Авторизация";
+            this.Deactivate += new System.EventHandler(this.authorization_Deactivate);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.authorization_FormClosing);
             this.Load += new System.EventHandler(this.authorization_Load);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.authorization_KeyPress);

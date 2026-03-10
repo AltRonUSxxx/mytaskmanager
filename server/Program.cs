@@ -25,7 +25,6 @@ namespace server
             {
                 TcpClient client = listener.AcceptTcpClient();
                 addLogs("New client");
-                //Task.Run(() => HandleClient(client));
                 _ = HandleClientAsync(client);
             }
         }
@@ -33,22 +32,23 @@ namespace server
         private static void addLogs(string line)
         {
             line = $"[{DateTime.Now:HH:mm}] " + line;
-            //File.AppendAllText(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), line+'\n' );
+            //File.AppendAllText(Environment.GetFolderPath(Environment.SpecialFolder.), line+'\n' );
             Console.WriteLine(line);
         }
 
         static async Task HandleClientAsync(TcpClient client)
         {
-            try
+            int user_id = -1;
+            using (NetworkStream stream = client.GetStream())
+            using (StreamReader reader = new StreamReader(stream))
+            using (StreamWriter writer = new StreamWriter(stream) { AutoFlush = true })
             {
-                using (NetworkStream stream = client.GetStream())
-                using (StreamReader reader = new StreamReader(stream))
-                using (StreamWriter writer = new StreamWriter(stream) { AutoFlush = true })
+                try
                 {
                     while (true)
                     {
                         string request = await reader.ReadLineAsync();
-                        if (request is null)
+                        if (string.IsNullOrEmpty(request))
                         {
                             addLogs("Client disconnected");
                             break;
@@ -59,18 +59,28 @@ namespace server
                         {
                             string result = await AuthService.loginAsync(arguments[1], arguments[2]);
                             await writer.WriteLineAsync(result);
+                            if(result.StartsWith("SUCCESS"))
+                            {
+                                user_id = Convert.ToInt32(result.Split('|')[1]);
+                                await AuthService.makeStatus(user_id, true);
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                addLogs(ex.ToString());
-            }
-            finally
-            {
-                client.Close();
-            }
+                catch (Exception ex)
+                {
+                    addLogs(ex.Message);
+                }
+                finally
+                {
+                    addLogs($"Client disconnected [{user_id}]");
+                    if(user_id != -1)
+                    {
+                        await AuthService.makeStatus(user_id, false);
+                    }
+                    client.Close();
+                }
+            }   
         }
     }
 }
