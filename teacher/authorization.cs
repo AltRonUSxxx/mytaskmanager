@@ -34,7 +34,6 @@ namespace teacher
 
         private string documentsPath;
 
-        private FormWinLocker winLocker;
         private FormMessageBox messager;
 
         BackgroundWorker Taskmgr_killer;
@@ -43,7 +42,6 @@ namespace teacher
             InitializeComponent();
             setLanguage();
             button_language_RU.BackColor = Color.Gray;
-            winLocker = new FormWinLocker();
             label_error.ForeColor = Color.Red;
             label_error.Text = "";
 
@@ -58,8 +56,6 @@ namespace teacher
         private void authorization_Load(object sender, EventArgs e)
         {
             documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            this.Owner = winLocker;
-            winLocker.Show();
             TopMost = true;
         }
 
@@ -245,7 +241,6 @@ namespace teacher
                 string answer = await Program.client.SendAsync($"LOGIN|{textBox_username.Text}|{textBox_password.Text}");
                 if(answer.StartsWith("SUCCESS"))
                 {
-                    winLocker.Hide();
                     this.Hide();
                     if (answer.Split('|')[2] == "3")
                     {
