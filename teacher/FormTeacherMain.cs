@@ -356,6 +356,7 @@ namespace teacher
                         textBox_student_add_menu_middle_name.Text = "";
                         textBox_student_add_menu_last_name.Text = "";
                         comboBox_student_add_menu_group.Text = "";
+                        textBox_student_add_menu_email.Text = "";
                         FormMessageBox message = new FormMessageBox(successAdding, language);
                         message.ShowDialog();
                         panel_students_add_menu.Visible = false;
