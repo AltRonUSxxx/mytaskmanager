@@ -43,6 +43,8 @@ namespace teacher
         private string select_row;
         private string successRemoving;
         private string not_found;
+        private string group_name_already_taken;
+        private string group_students_count;
 
 
         public FormTeacherMain(string language_out, string[] alertMessages)
@@ -53,8 +55,9 @@ namespace teacher
             label_student_add_menu_error.Text = "";
             makeSquareCorner();
             language = language_out;
-            initLanguage(language_out, alertMessages);
+            initDataGridView(dataGridView_groups);
             initDataGridView(dataGridView_students);
+            initLanguage(language_out, alertMessages);
             comboBox_student_add_menu_group.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
@@ -84,10 +87,7 @@ namespace teacher
             dataGridView.AllowUserToDeleteRows = false;
             dataGridView.MultiSelect = false;
 
-            dataGridView.Columns[0].Width = 257;
-            dataGridView.Columns[1].Width = 110;
-            dataGridView.Columns[2].Width = 100;
-            dataGridView.Columns[3].Width = 90;
+            
         }
 
         private async void initLanguage(string language, string[] alertMessages)
@@ -120,6 +120,10 @@ namespace teacher
                     select_row = "Выберете строку";
                     successRemoving = "Успешное удаление";
                     not_found = "не найдено";
+                    group_name_already_taken = "Это имя уже занято!";
+                    group_students_count = "Учеников";
+
+
 
                     button_groups.Text = "Группы";
 
@@ -144,6 +148,13 @@ namespace teacher
             dataGridView_students.Columns.Add("student_login", login_student);
             dataGridView_students.Columns.Add("student_status", status_student);
             dataGridView_students.Columns.Add("student_group", group_student);
+            dataGridView_students.Columns[0].Width = 257;
+            dataGridView_students.Columns[1].Width = 110;
+            dataGridView_students.Columns[2].Width = 100;
+            dataGridView_students.Columns[3].Width = 90;
+
+            dataGridView_groups.Columns.Add("group_name", group_student);
+            dataGridView_groups.Columns.Add("population", group_students_count);
         }
 
         private void hideAllPanels()
@@ -265,10 +276,22 @@ namespace teacher
             }
         }
 
+        private async void loadGroups()
+        {
+            string answer = await Program.client.SendAsync($"GET_GROUPS");
+            dataGridView_groups.Rows.Clear();
+            string[] groups = answer.Split('/');
+            foreach (string student in groups)
+            {
+                dataGridView_groups.Rows.Add(student.Split('|'));
+            }
+        }
+
 
 
         private void button_groups_Click(object sender, EventArgs e)
         {
+            loadGroups();
             hideAllPanels();
             disableAllButtons();
             show_panel(panel_groups);
@@ -392,21 +415,100 @@ namespace teacher
 
         private async void button_students_remove_Click(object sender, EventArgs e)
         {
-            int selectedIndex = dataGridView_students.SelectedCells[0].RowIndex;
-            string username = dataGridView_students.Rows[selectedIndex].Cells[1].Value.ToString();
-            string answer = await Program.client.SendAsync($"REMOVE|{username}");
+            if(dataGridView_students.SelectedCells.Count > 0)
+            {
+                int selectedIndex = dataGridView_students.SelectedCells[0].RowIndex;
+                string username = dataGridView_students.Rows[selectedIndex].Cells[1].Value.ToString();
+                string answer = await Program.client.SendAsync($"REMOVE|{username}");
+                switch(answer)
+                {
+                    case "SUCCESS":
+                        loadStudents();
+                        showMessage(successRemoving, language);
+                        break;
+                    case "UNEXPECTED_ERROR":
+                        showMessage(failedAdding, language);
+                        break;
+                    case "NOT_FOUND":
+                        showMessage(not_found,language);
+                        break;
+                }
+            }
+            else
+            {
+                showMessage(select_row, language);
+            }
+
+        }
+
+        private void button_groups_add_Click(object sender, EventArgs e)
+        {
+            panel_group_managment_add_menu.Visible = true;
+        }
+
+        private async void button_groups_remove_Click(object sender, EventArgs e)
+        {
+            if (dataGridView_groups.SelectedCells.Count > 0)
+            {
+                int selectedIndex = dataGridView_groups.SelectedCells[0].RowIndex;
+                string username = dataGridView_groups.Rows[selectedIndex].Cells[0].Value.ToString();
+                string answer = await Program.client.SendAsync($"REMOVE_GROUP|{username}");
+                switch (answer)
+                {
+                    case "SUCCESS":
+                        loadGroups();
+                        showMessage(successRemoving, language);
+                        break;
+                    case "UNEXPECTED_ERROR":
+                        showMessage(failedAdding, language);
+                        break;
+                    case "NOT_FOUND":
+                        showMessage(not_found, language);
+                        break;
+                }
+            }
+            else
+            {
+                showMessage(select_row, language);
+            }
+        }
+
+        private async void button_group_managment_add_menu_add_Click(object sender, EventArgs e)
+        {
+            if(textBox_group_managment_add_menu_name.Text.Length < 3)
+            {
+                showMessage(moreThan, language);
+                return;
+            }
+            string name = textBox_group_managment_add_menu_name.Text;
+            string answer = await Program.client.SendAsync($"ADD_GROUP|{name}");
             switch(answer)
             {
+                case "NAME_ALREADY_TAKEN":
+                    label_group_managment_add_menu_error.Text = group_name_already_taken;
+                    break;
+
                 case "SUCCESS":
-                    loadStudents();
-                    showMessage(successRemoving, language);
+                    loadGroups();
+                    textBox_group_managment_add_menu_name.Text = "";
+                    panel_group_managment_add_menu.Visible=false;
+                    showMessage(successAdding, language);
                     break;
-                case "UNEXPECTED_ERROR":
-                    showMessage(failedAdding, language);
-                    break;
-                case "NOT_FOUND":
-                    showMessage(not_found,language);
-                    break;
+            }
+        }
+
+        private void button_group_managment_add_menu_cancel_Click(object sender, EventArgs e)
+        {
+            panel_group_managment_add_menu.Visible = false;
+        }
+
+        private async void comboBox_student_add_menu_group_Click(object sender, EventArgs e)
+        {
+            string answer = await Program.client.SendAsync($"GET_GROUPS_NAME");
+            comboBox_student_add_menu_group.Items.Clear();
+            foreach(string group_name in answer.Split('|'))
+            {
+                comboBox_student_add_menu_group.Items.Add(group_name);
             }
         }
     }

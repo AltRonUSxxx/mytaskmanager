@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace server
@@ -170,6 +172,97 @@ namespace server
                     answer = answer.Append(temp).ToArray();
                 }
                 return answer;
+            }
+        }
+
+        private static int getGroupPopularity(int group_id)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                return db.users.Where(x => x.group_id == group_id).ToArray().Length;
+            }
+        }
+
+        private static user[] getUsersInGroup(group this_group)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                user[] users = db.users.Where(x => x.group_id == this_group.id).ToArray();
+                return users;
+            }
+
+        }
+
+        public static async Task<string> remove_group(string group_name)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                var this_group = db.groups.FirstOrDefault(x => x.name == group_name);
+                if(this_group != null)
+                {
+                    try
+                    {
+                        foreach(user student in getUsersInGroup(this_group))
+                        {
+                            student.group_id = 1;
+                        }
+                        db.groups.Remove(this_group);
+                        db.SaveChanges();
+                        return "SUCCESS";
+                    }
+                    catch (Exception ex)
+                    {
+                        return "UNEXPECTED_ERROR";
+                    }
+                }
+                else
+                {
+                    return "NOT_FOUND";
+                }
+            }
+        }
+
+        public static async Task<string[]> getGroups()
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                string[] answer = { };
+                group[] allGroups = db.groups.Select(x => x).ToArray();
+                foreach (group this_group in allGroups)
+                {
+                    string temp = $"{this_group.name}|{getGroupPopularity(Convert.ToInt32(this_group.id))}|";
+                    answer = answer.Append(temp).ToArray();
+                }
+                return answer;
+            }
+        }
+
+        public static async Task<string> add_group(string group_name)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                var groupCheck = db.groups.FirstOrDefault(x => x.name == group_name);
+                if(groupCheck != null)
+                {
+                    return "NAME_ALREADY_TAKEN";
+                }
+                else
+                {
+                    group new_group = new group();
+                    new_group.name = group_name;
+                    db.groups.Add(new_group);
+                    db.SaveChanges();
+                    return "SUCCESS";
+                }
+            }
+        }
+
+        public static async Task<string> get_groups_name()
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                string[] groups = db.groups.Select(x => x.name).ToArray();
+                return string.Join("|", groups);
             }
         }
 

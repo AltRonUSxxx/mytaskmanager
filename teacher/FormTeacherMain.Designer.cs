@@ -36,6 +36,12 @@
             this.button_students = new System.Windows.Forms.Button();
             this.button_groups = new System.Windows.Forms.Button();
             this.panel_groups = new System.Windows.Forms.Panel();
+            this.panel_group_managment_add_menu = new System.Windows.Forms.Panel();
+            this.button_group_managment_add_menu_cancel = new System.Windows.Forms.Button();
+            this.label_group_managment_add_menu_name = new System.Windows.Forms.Label();
+            this.textBox_group_managment_add_menu_name = new System.Windows.Forms.TextBox();
+            this.button_group_managment_add_menu_add = new System.Windows.Forms.Button();
+            this.label_group_managment_add_menu_error = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.button_groups_remove = new System.Windows.Forms.Button();
             this.button_groups_add = new System.Windows.Forms.Button();
@@ -69,6 +75,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.panel_groups.SuspendLayout();
+            this.panel_group_managment_add_menu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_groups)).BeginInit();
             this.panel_students.SuspendLayout();
             this.panel_students_add_menu.SuspendLayout();
@@ -155,6 +162,7 @@
             // 
             // panel_groups
             // 
+            this.panel_groups.Controls.Add(this.panel_group_managment_add_menu);
             this.panel_groups.Controls.Add(this.label3);
             this.panel_groups.Controls.Add(this.button_groups_remove);
             this.panel_groups.Controls.Add(this.button_groups_add);
@@ -164,6 +172,67 @@
             this.panel_groups.Size = new System.Drawing.Size(584, 417);
             this.panel_groups.TabIndex = 16;
             this.panel_groups.Visible = false;
+            // 
+            // panel_group_managment_add_menu
+            // 
+            this.panel_group_managment_add_menu.Controls.Add(this.button_group_managment_add_menu_cancel);
+            this.panel_group_managment_add_menu.Controls.Add(this.label_group_managment_add_menu_name);
+            this.panel_group_managment_add_menu.Controls.Add(this.textBox_group_managment_add_menu_name);
+            this.panel_group_managment_add_menu.Controls.Add(this.button_group_managment_add_menu_add);
+            this.panel_group_managment_add_menu.Controls.Add(this.label_group_managment_add_menu_error);
+            this.panel_group_managment_add_menu.Location = new System.Drawing.Point(6, 42);
+            this.panel_group_managment_add_menu.Name = "panel_group_managment_add_menu";
+            this.panel_group_managment_add_menu.Size = new System.Drawing.Size(575, 372);
+            this.panel_group_managment_add_menu.TabIndex = 4;
+            this.panel_group_managment_add_menu.Visible = false;
+            // 
+            // button_group_managment_add_menu_cancel
+            // 
+            this.button_group_managment_add_menu_cancel.Location = new System.Drawing.Point(295, 263);
+            this.button_group_managment_add_menu_cancel.Name = "button_group_managment_add_menu_cancel";
+            this.button_group_managment_add_menu_cancel.Size = new System.Drawing.Size(125, 45);
+            this.button_group_managment_add_menu_cancel.TabIndex = 20;
+            this.button_group_managment_add_menu_cancel.Text = "{cancel}";
+            this.button_group_managment_add_menu_cancel.UseVisualStyleBackColor = true;
+            this.button_group_managment_add_menu_cancel.Click += new System.EventHandler(this.button_group_managment_add_menu_cancel_Click);
+            // 
+            // label_group_managment_add_menu_name
+            // 
+            this.label_group_managment_add_menu_name.AutoSize = true;
+            this.label_group_managment_add_menu_name.Location = new System.Drawing.Point(234, 57);
+            this.label_group_managment_add_menu_name.Name = "label_group_managment_add_menu_name";
+            this.label_group_managment_add_menu_name.Size = new System.Drawing.Size(90, 24);
+            this.label_group_managment_add_menu_name.TabIndex = 19;
+            this.label_group_managment_add_menu_name.Text = "*{name}";
+            // 
+            // textBox_group_managment_add_menu_name
+            // 
+            this.textBox_group_managment_add_menu_name.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.textBox_group_managment_add_menu_name.Location = new System.Drawing.Point(149, 113);
+            this.textBox_group_managment_add_menu_name.Name = "textBox_group_managment_add_menu_name";
+            this.textBox_group_managment_add_menu_name.Size = new System.Drawing.Size(274, 26);
+            this.textBox_group_managment_add_menu_name.TabIndex = 5;
+            // 
+            // button_group_managment_add_menu_add
+            // 
+            this.button_group_managment_add_menu_add.Location = new System.Drawing.Point(167, 263);
+            this.button_group_managment_add_menu_add.Name = "button_group_managment_add_menu_add";
+            this.button_group_managment_add_menu_add.Size = new System.Drawing.Size(125, 45);
+            this.button_group_managment_add_menu_add.TabIndex = 19;
+            this.button_group_managment_add_menu_add.Text = "{add}";
+            this.button_group_managment_add_menu_add.UseVisualStyleBackColor = true;
+            this.button_group_managment_add_menu_add.Click += new System.EventHandler(this.button_group_managment_add_menu_add_Click);
+            // 
+            // label_group_managment_add_menu_error
+            // 
+            this.label_group_managment_add_menu_error.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label_group_managment_add_menu_error.ForeColor = System.Drawing.Color.DarkRed;
+            this.label_group_managment_add_menu_error.Location = new System.Drawing.Point(12, 215);
+            this.label_group_managment_add_menu_error.Name = "label_group_managment_add_menu_error";
+            this.label_group_managment_add_menu_error.Size = new System.Drawing.Size(545, 33);
+            this.label_group_managment_add_menu_error.TabIndex = 19;
+            this.label_group_managment_add_menu_error.Text = "{error}";
+            this.label_group_managment_add_menu_error.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label3
             // 
@@ -183,6 +252,7 @@
             this.button_groups_remove.TabIndex = 2;
             this.button_groups_remove.Text = "{remove}";
             this.button_groups_remove.UseVisualStyleBackColor = true;
+            this.button_groups_remove.Click += new System.EventHandler(this.button_groups_remove_Click);
             // 
             // button_groups_add
             // 
@@ -193,6 +263,7 @@
             this.button_groups_add.TabIndex = 1;
             this.button_groups_add.Text = "{add}";
             this.button_groups_add.UseVisualStyleBackColor = true;
+            this.button_groups_add.Click += new System.EventHandler(this.button_groups_add_Click);
             // 
             // dataGridView_groups
             // 
@@ -306,6 +377,7 @@
             this.comboBox_student_add_menu_group.Name = "comboBox_student_add_menu_group";
             this.comboBox_student_add_menu_group.Size = new System.Drawing.Size(148, 32);
             this.comboBox_student_add_menu_group.TabIndex = 12;
+            this.comboBox_student_add_menu_group.Click += new System.EventHandler(this.comboBox_student_add_menu_group_Click);
             // 
             // label_student_add_menu_middle_name
             // 
@@ -473,6 +545,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.panel_groups.ResumeLayout(false);
             this.panel_groups.PerformLayout();
+            this.panel_group_managment_add_menu.ResumeLayout(false);
+            this.panel_group_managment_add_menu.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_groups)).EndInit();
             this.panel_students.ResumeLayout(false);
             this.panel_students.PerformLayout();
@@ -523,5 +597,11 @@
         private System.Windows.Forms.Label label_student_add_menu_error;
         private System.Windows.Forms.Label label_student_add_menu_email;
         private System.Windows.Forms.TextBox textBox_student_add_menu_email;
+        private System.Windows.Forms.Panel panel_group_managment_add_menu;
+        private System.Windows.Forms.TextBox textBox_group_managment_add_menu_name;
+        private System.Windows.Forms.Label label_group_managment_add_menu_name;
+        private System.Windows.Forms.Button button_group_managment_add_menu_cancel;
+        private System.Windows.Forms.Button button_group_managment_add_menu_add;
+        private System.Windows.Forms.Label label_group_managment_add_menu_error;
     }
 }

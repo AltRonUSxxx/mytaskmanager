@@ -56,6 +56,7 @@ namespace server
                         addLogs($"READ: {request}");
                         string[] arguments = request.Split('|');
                         string result;
+                        string[] results;
                         switch (arguments[0])
                         {
                             case "LOGIN":
@@ -82,13 +83,37 @@ namespace server
 
                             case "GET_STUDENTS":
                                 addLogs($"GET_STUDENTS request [{user_id}]");
-                                string[] results = await AuthService.getStudents();
+                                results = await AuthService.getStudents();
                                 await writer.WriteLineAsync(string.Join("/", results));
                                 break;
 
                             case "REMOVE":
                                 addLogs($"REMOVE request [{user_id}]");
                                 result = await AuthService.remove(arguments[1]);
+                                await writer.WriteLineAsync(result);
+                                break;
+
+                            case "ADD_GROUP":
+                                addLogs($"ADD_GROUP request [{user_id}]");
+                                result = await AuthService.add_group(arguments[1]);
+                                await writer.WriteLineAsync(result);
+                                break;
+
+                            case "GET_GROUPS_NAME":
+                                addLogs($"GET_GROUPS_NAME request [{user_id}]");
+                                result = await AuthService.get_groups_name();
+                                await writer.WriteLineAsync(result);
+                                break;
+
+                            case "GET_GROUPS":
+                                addLogs($"GET_GROUPS request [{user_id}]");
+                                results = await AuthService.getGroups();
+                                await writer.WriteLineAsync(string.Join("/", results));
+                                break;
+
+                            case "REMOVE_GROUP":
+                                addLogs($"REMOVE_GROUP request [{user_id}]");
+                                result = await AuthService.remove_group(arguments[1]);
                                 await writer.WriteLineAsync(result);
                                 break;
                         }
