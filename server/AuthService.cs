@@ -421,6 +421,60 @@ namespace server
             }
         }
 
+        public static async Task<string> get_full_user(string username)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                user this_user = db.users.FirstOrDefault(x => x.username == username);
+                if(this_user != null)
+                {
+                    try
+                    {
+                        fullname user_fullname = db.fullnames.FirstOrDefault(x => x.user_id == this_user.id);
+                        string answer = $"SUCCESS|{this_user.username}|" +
+                            $"{user_fullname.name}|" +
+                            $"{user_fullname.lastname}|" +
+                            $"{user_fullname.middlename}|" +
+                            $"{this_user.email}|" +
+                            $"{await getGroup_name(Convert.ToInt32(this_user.group_id))}";
+                        return answer;
+                    }
+                    catch
+                    {
+                        return "UNEXPECTED_ERROR";
+                    }
+                }
+                else
+                {
+                    return "NOT_FOUND";
+                }
+            }
+        }
+
+        public static async Task<string> redact_user(string username, string password, string password_confirm, string email, string firstname, string lastname, string middlename, string group)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                user this_user = db.users.FirstOrDefault(x => x.username == username);
+                if(this_user == null)
+                {
+                    return "NOT_FOUND";
+                }
+                if(password != "")
+                {
+                    if (passwordHasher.verifyPassword(password_confirm, this_user.hashed_password))
+                    {
+                        this_user.hashed_password = passwordHasher.hashPassword(password_confirm);
+                    }
+                    else
+                    {
+                        return "WRONG_PASSWORD";
+                    }
+
+                }
+            }
+        }
+
 
     }
 }   

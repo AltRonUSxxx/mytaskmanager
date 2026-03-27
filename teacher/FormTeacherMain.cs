@@ -20,6 +20,8 @@ namespace teacher
     {
         private string language;
 
+        private bool isUserRedacting;
+
         private string allarmCloseText;
         private string fillNeadableText;
         private string useOnlyLetterAndNumber;
@@ -33,7 +35,7 @@ namespace teacher
         private string successAdding;
         private string alreadyTakenUsername;
         private string alreadyTakenEmail;
-        private string failedAdding;
+        private string unexpected_error;
         private string fullname_student;
         private string login_student;
         private string status_student;
@@ -54,6 +56,12 @@ namespace teacher
         private string status_completed;
         private string status_procesing;
         private string status_watiting;
+        private string student_redact;
+        private string student_add;
+        private string old_password;
+        private string new_password;
+        private string student_password;
+        private string student_password_confirm;
 
 
         public FormTeacherMain(string language_out, string[] alertMessages)
@@ -62,6 +70,7 @@ namespace teacher
             InitializeComponent();
             panel_students.Visible = false;
             label_student_add_menu_error.Text = "";
+            isUserRedacting = false;
             makeSquareCorner();
             language = language_out;
             initDataGridView(dataGridView_groups);
@@ -129,7 +138,7 @@ namespace teacher
                     successAdding = "Успешное добавление!";
                     alreadyTakenUsername = "Этот логин уже занят!";
                     alreadyTakenEmail = "Эта почта уже занята!";
-                    failedAdding = "Неизвестная ошибка!";
+                    unexpected_error = "Неизвестная ошибка!";
                     fullname_student = "ФИО";
                     login_student = "Логин";
                     status_student = "Статус";
@@ -150,6 +159,12 @@ namespace teacher
                     status_completed = "Завершен";
                     status_procesing = "В процесе";
                     status_watiting  = "Ожидание";
+                    student_redact = "Изменить";
+                    student_add = "Добавить";
+                    old_password = "Старый пароль";
+                    new_password = "Новый пароль";
+                    student_password = "*Пароль";
+                    student_password_confirm = "*Потверждение пароля";
 
 
 
@@ -181,8 +196,8 @@ namespace teacher
                     label_student_add_menu_middle_name.Text = "Отчество";
                     label_student_add_menu_group.Text = "Группа";
                     label_student_add_menu_username.Text = "*Логин";
-                    label_student_add_menu_password.Text = "*Пароль";
-                    label_student_add_menu_password_confirm.Text = "*Потверждение пароля";
+                    label_student_add_menu_password.Text = student_password;
+                    label_student_add_menu_password_confirm.Text = student_password_confirm;
                     label_student_manangment.Text = "Управление студентами";
                     label_student_add_menu_email.Text = "*Почта";
                     button_students_add.Text = "Добавить";
@@ -394,10 +409,18 @@ namespace teacher
                 label_student_add_menu_error.Text = wrongEmail;
                 return;
             }
-            else if (check_validation(password,username))
+            else if (check_validation(password,username) || (isUserRedacting))
             {
-                string answer = await Program.client.SendAsync($"REGISTER|{username}|{password}|{email}|{firstname}|{lastname}|{middlename}|{group}");
-                switch(answer)
+                string answer;
+                if (isUserRedacting)
+                {
+                    answer = await Program.client.SendAsync($"REDACT_USER|{username}|{password}|{password_confirm}|{email}|{firstname}|{lastname}|{middlename}|{group}");
+                }
+                else
+                {
+                    answer = await Program.client.SendAsync($"REGISTER|{username}|{password}|{email}|{firstname}|{lastname}|{middlename}|{group}");
+                }
+                switch (answer)
                 {
                     case "SUCCESS":
                         loadStudents();
@@ -420,7 +443,7 @@ namespace teacher
                         label_student_add_menu_error.Text = alreadyTakenEmail;
                         break;
                     default:
-                        label_student_add_menu_error.Text = failedAdding;
+                        label_student_add_menu_error.Text = unexpected_error;
                         break;
                 }
             }
@@ -492,7 +515,7 @@ namespace teacher
                         showMessage(successRemoving, language);
                         break;
                     case "UNEXPECTED_ERROR":
-                        showMessage(failedAdding, language);
+                        showMessage(unexpected_error, language);
                         break;
                     case "NOT_FOUND":
                         showMessage(not_found,language);
@@ -525,7 +548,7 @@ namespace teacher
                         showMessage(successRemoving, language);
                         break;
                     case "UNEXPECTED_ERROR":
-                        showMessage(failedAdding, language);
+                        showMessage(unexpected_error, language);
                         break;
                     case "NOT_FOUND":
                         showMessage(not_found, language);
@@ -676,7 +699,7 @@ namespace teacher
                     dateTimePicker_lessons_managment_add_menu_date.Text = DateTime.Now.ToString();
                     break;
                 case "UNEXPECTED_ERROR":
-                    showMessage(failedAdding, language);
+                    showMessage(unexpected_error, language);
                     break;
             }
         }
@@ -695,7 +718,7 @@ namespace teacher
                         showMessage(successRemoving, language);
                         break;
                     case "UNEXPECTED_ERROR":
-                        showMessage(failedAdding, language);
+                        showMessage(unexpected_error, language);
                         break;
                     case "NOT_FOUND":
                         showMessage(not_found, language);
@@ -708,9 +731,53 @@ namespace teacher
             }
         }
 
+        private async void stop_user_redacting()
+        {
+            isUserRedacting = false;
+            button_student_managment_add_menu_cancel.Text = student_add;
+            label_student_add_menu_password.Text = student_password;
+            label_student_add_menu_password_confirm.Text = student_password_confirm;
+        }
+
+        private async void redact_student(DataGridViewRow row)
+        {
+            string username = row.Cells[1].Value.ToString();
+            string answer = await Program.client.SendAsync($"GET_FULL_USER|{username}");
+            panel_students_add_menu.Visible = true;
+            switch (answer)
+            {
+                case "UNEXPECTED_ERROR":
+                    showMessage(unexpected_error, language);
+                    break;
+                case "NOT_FOUND":
+                    showMessage(not_found, language);
+                    break;
+                default:
+                    isUserRedacting = true;
+                    panel_students_add_menu.Visible = true;
+                    string[] userdata = answer.Split('|');
+                    textBox_student_add_menu_username.Text = userdata[1];
+                    textBox_student_add_menu_first_name.Text = userdata[2];
+                    textBox_student_add_menu_last_name.Text = userdata[3];
+                    textBox_student_add_menu_middle_name.Text = userdata[4];
+                    textBox_student_add_menu_email.Text = userdata[5];
+
+                    textBox_student_add_menu_password.Text = "";
+                    textBox_student_add_menu_password_confirm.Text = "";
+
+                    label_student_add_menu_password.Text = old_password;
+                    label_student_add_menu_password_confirm.Text = new_password;
+                    isUserRedacting = true;
+                    break;
+            }
+        }
+
         private void dataGridView_students_DoubleClick(object sender, EventArgs e)
         {
-            showMessage("Clicked", language);
+            if(dataGridView_students.SelectedRows.Count > 0)
+            {
+                redact_student(dataGridView_students.SelectedRows[0]);
+            }
         }
     }
 }

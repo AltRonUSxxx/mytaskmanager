@@ -203,7 +203,7 @@
             this.panel_group_managment_add_menu.Controls.Add(this.textBox_group_managment_add_menu_name);
             this.panel_group_managment_add_menu.Controls.Add(this.button_group_managment_add_menu_add);
             this.panel_group_managment_add_menu.Controls.Add(this.label_group_managment_add_menu_error);
-            this.panel_group_managment_add_menu.Location = new System.Drawing.Point(0, 0);
+            this.panel_group_managment_add_menu.Location = new System.Drawing.Point(3, 42);
             this.panel_group_managment_add_menu.Name = "panel_group_managment_add_menu";
             this.panel_group_managment_add_menu.Size = new System.Drawing.Size(575, 372);
             this.panel_group_managment_add_menu.TabIndex = 4;
@@ -762,8 +762,8 @@
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.panel_students);
-            this.Controls.Add(this.panel_lessons);
             this.Controls.Add(this.panel_groups);
+            this.Controls.Add(this.panel_lessons);
             this.Font = new System.Drawing.Font("Arial", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(6);

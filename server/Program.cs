@@ -138,6 +138,12 @@ namespace server
                                 addLogs($"ANSWERS: {result}");
                                 await writer.WriteLineAsync(result);
                                 break;
+                            case "GET_FULL_USER":
+                                addLogs($"GET_FULL_USER request [{user_id}]");
+                                result = await AuthService.get_full_user(arguments[1]);
+                                addLogs($"ANSWERS: {result}");
+                                await writer.WriteLineAsync(result);
+                                break;
                         }
                     }
                 }
