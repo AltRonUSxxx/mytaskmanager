@@ -238,12 +238,18 @@ namespace server
                         {
                             student.group_id = 1;
                         }
+                        lesson this_lesson = db.lessons.FirstOrDefault(x => x.group_id == this_group.id);
+                        if(this_lesson != null)
+                        {
+                            db.lessons.Remove(this_lesson);
+                        }
                         db.groups.Remove(this_group);
                         db.SaveChanges();
                         return "SUCCESS";
                     }
                     catch (Exception ex)
                     {
+                        Console.WriteLine(ex.Message);
                         return "UNEXPECTED_ERROR";
                     }
                 }
@@ -297,6 +303,23 @@ namespace server
                 return string.Join("|", groups);
             }
         }
+
+        private static string get_lesson_status_name(int status_id)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                status this_status = db.status.FirstOrDefault(x => x.id == status_id);
+                if(this_status == null)
+                {
+                    return "-";
+                }
+                else
+                {
+                    return this_status.name;
+                }
+            }
+        }
+
         public static async Task<string> get_lessons()
         {
             using (var db = new teacher_studentEntities())
@@ -304,9 +327,38 @@ namespace server
                 string[] lessons = { };
                 foreach (lesson this_lesson in db.lessons)
                 {
-                    lessons = lessons.Append($"{this_lesson.theme}/{this_lesson.group_id}/{this_lesson.start_time}").ToArray();
+                    lessons = lessons.Append($"{this_lesson.id}/" +
+                        $"{this_lesson.theme}/" +
+                        $"{await getGroup_name(this_lesson.group_id)}/" +
+                        $"{get_lesson_status_name(this_lesson.status_id)}/" +
+                        $"{this_lesson.start_time.ToString("dd.MM.yyyy/HH:mm")}").ToArray();
                 }
                 return string.Join("|", lessons);
+            }
+        }
+
+        public static async Task<string> remove_lesson(int lesson_id)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                lesson this_lesson = db.lessons.FirstOrDefault(x => x.id == lesson_id);
+                if(this_lesson != null)
+                {
+                    try
+                    {
+                        db.lessons.Remove(this_lesson);
+                        db.SaveChanges();
+                        return "SUCCESS";
+                    }
+                    catch (Exception ex)
+                    {
+                        return "UNEXCEPTED_ERROR";
+                    }
+                }
+                else
+                {
+                    return "NOT_FOUND";
+                }
             }
         }
 

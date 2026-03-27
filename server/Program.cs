@@ -132,6 +132,12 @@ namespace server
                                 addLogs($"ANSWERS: {result}");
                                 await writer.WriteLineAsync(result);
                                 break;
+                            case "REMOVE_LESSON":
+                                addLogs($"REMOVE_LESSON request [{user_id}]");
+                                result = await AuthService.remove_lesson(Convert.ToInt32(arguments[1]));
+                                addLogs($"ANSWERS: {result}");
+                                await writer.WriteLineAsync(result);
+                                break;
                         }
                     }
                 }

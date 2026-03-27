@@ -42,7 +42,7 @@
             this.textBox_group_managment_add_menu_name = new System.Windows.Forms.TextBox();
             this.button_group_managment_add_menu_add = new System.Windows.Forms.Button();
             this.label_group_managment_add_menu_error = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.label_groups_managment = new System.Windows.Forms.Label();
             this.button_groups_remove = new System.Windows.Forms.Button();
             this.button_groups_add = new System.Windows.Forms.Button();
             this.dataGridView_groups = new System.Windows.Forms.DataGridView();
@@ -86,7 +86,7 @@
             this.label_lessons_managment_add_menu_theme = new System.Windows.Forms.Label();
             this.textBox_lessons_managment_add_menu_theme = new System.Windows.Forms.TextBox();
             this.button_lessons_managment_add_menu_add = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
+            this.label_lessons_add_menu_error = new System.Windows.Forms.Label();
             this.label_lessons_managment = new System.Windows.Forms.Label();
             this.button_lessons_remove = new System.Windows.Forms.Button();
             this.button_lessons_add = new System.Windows.Forms.Button();
@@ -186,7 +186,7 @@
             // panel_groups
             // 
             this.panel_groups.Controls.Add(this.panel_group_managment_add_menu);
-            this.panel_groups.Controls.Add(this.label3);
+            this.panel_groups.Controls.Add(this.label_groups_managment);
             this.panel_groups.Controls.Add(this.button_groups_remove);
             this.panel_groups.Controls.Add(this.button_groups_add);
             this.panel_groups.Controls.Add(this.dataGridView_groups);
@@ -203,7 +203,7 @@
             this.panel_group_managment_add_menu.Controls.Add(this.textBox_group_managment_add_menu_name);
             this.panel_group_managment_add_menu.Controls.Add(this.button_group_managment_add_menu_add);
             this.panel_group_managment_add_menu.Controls.Add(this.label_group_managment_add_menu_error);
-            this.panel_group_managment_add_menu.Location = new System.Drawing.Point(6, 42);
+            this.panel_group_managment_add_menu.Location = new System.Drawing.Point(0, 0);
             this.panel_group_managment_add_menu.Name = "panel_group_managment_add_menu";
             this.panel_group_managment_add_menu.Size = new System.Drawing.Size(575, 372);
             this.panel_group_managment_add_menu.TabIndex = 4;
@@ -257,14 +257,14 @@
             this.label_group_managment_add_menu_error.Text = "{error}";
             this.label_group_managment_add_menu_error.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // label3
+            // label_groups_managment
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(11, 15);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(215, 24);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "{Group managment}";
+            this.label_groups_managment.AutoSize = true;
+            this.label_groups_managment.Location = new System.Drawing.Point(11, 15);
+            this.label_groups_managment.Name = "label_groups_managment";
+            this.label_groups_managment.Size = new System.Drawing.Size(215, 24);
+            this.label_groups_managment.TabIndex = 3;
+            this.label_groups_managment.Text = "{Group managment}";
             // 
             // button_groups_remove
             // 
@@ -542,6 +542,7 @@
             this.dataGridView_students.Name = "dataGridView_students";
             this.dataGridView_students.Size = new System.Drawing.Size(557, 288);
             this.dataGridView_students.TabIndex = 0;
+            this.dataGridView_students.DoubleClick += new System.EventHandler(this.dataGridView_students_DoubleClick);
             // 
             // button_lessons
             // 
@@ -582,7 +583,7 @@
             this.panel_lessons_managment_add_menu.Controls.Add(this.label_lessons_managment_add_menu_theme);
             this.panel_lessons_managment_add_menu.Controls.Add(this.textBox_lessons_managment_add_menu_theme);
             this.panel_lessons_managment_add_menu.Controls.Add(this.button_lessons_managment_add_menu_add);
-            this.panel_lessons_managment_add_menu.Controls.Add(this.label4);
+            this.panel_lessons_managment_add_menu.Controls.Add(this.label_lessons_add_menu_error);
             this.panel_lessons_managment_add_menu.Location = new System.Drawing.Point(6, 42);
             this.panel_lessons_managment_add_menu.Name = "panel_lessons_managment_add_menu";
             this.panel_lessons_managment_add_menu.Size = new System.Drawing.Size(575, 372);
@@ -696,16 +697,16 @@
             this.button_lessons_managment_add_menu_add.UseVisualStyleBackColor = true;
             this.button_lessons_managment_add_menu_add.Click += new System.EventHandler(this.button_lessons_managment_add_menu_add_Click);
             // 
-            // label4
+            // label_lessons_add_menu_error
             // 
-            this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label4.ForeColor = System.Drawing.Color.DarkRed;
-            this.label4.Location = new System.Drawing.Point(15, 236);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(545, 33);
-            this.label4.TabIndex = 19;
-            this.label4.Text = "{error}";
-            this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label_lessons_add_menu_error.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label_lessons_add_menu_error.ForeColor = System.Drawing.Color.DarkRed;
+            this.label_lessons_add_menu_error.Location = new System.Drawing.Point(15, 236);
+            this.label_lessons_add_menu_error.Name = "label_lessons_add_menu_error";
+            this.label_lessons_add_menu_error.Size = new System.Drawing.Size(545, 33);
+            this.label_lessons_add_menu_error.TabIndex = 19;
+            this.label_lessons_add_menu_error.Text = "{error}";
+            this.label_lessons_add_menu_error.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label_lessons_managment
             // 
@@ -725,6 +726,7 @@
             this.button_lessons_remove.TabIndex = 2;
             this.button_lessons_remove.Text = "{remove}";
             this.button_lessons_remove.UseVisualStyleBackColor = true;
+            this.button_lessons_remove.Click += new System.EventHandler(this.button_lessons_remove_Click);
             // 
             // button_lessons_add
             // 
@@ -759,8 +761,8 @@
             this.Controls.Add(this.pictureBox_uppestPanel);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.panel_lessons);
             this.Controls.Add(this.panel_students);
+            this.Controls.Add(this.panel_lessons);
             this.Controls.Add(this.panel_groups);
             this.Font = new System.Drawing.Font("Arial", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -808,7 +810,7 @@
         private System.Windows.Forms.Button button_students_add;
         private System.Windows.Forms.DataGridView dataGridView_students;
         private System.Windows.Forms.Label label_student_manangment;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label_groups_managment;
         private System.Windows.Forms.Panel panel_students_add_menu;
         private System.Windows.Forms.TextBox textBox_student_add_menu_password_confirm;
         private System.Windows.Forms.TextBox textBox_student_add_menu_password;
@@ -841,7 +843,7 @@
         private System.Windows.Forms.Button button_lessons_managment_add_menu_cancel;
         private System.Windows.Forms.Label label_lessons_managment_add_menu_theme;
         private System.Windows.Forms.Button button_lessons_managment_add_menu_add;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label_lessons_add_menu_error;
         private System.Windows.Forms.Label label_lessons_managment;
         private System.Windows.Forms.Button button_lessons_remove;
         private System.Windows.Forms.Button button_lessons_add;

@@ -45,6 +45,15 @@ namespace teacher
         private string not_found;
         private string group_name_already_taken;
         private string group_students_count;
+        private string lessons_theme;
+        private string lessons_group_id;
+        private string lessons_start_date;
+        private string lessons_start_time;
+        private string lesson_status;
+        private string status_canceled;
+        private string status_completed;
+        private string status_procesing;
+        private string status_watiting;
 
 
         public FormTeacherMain(string language_out, string[] alertMessages)
@@ -132,10 +141,39 @@ namespace teacher
                     not_found = "не найдено";
                     group_name_already_taken = "Это имя уже занято!";
                     group_students_count = "Учеников";
+                    lessons_theme = "Тема";
+                    lessons_group_id = "Группа";
+                    lesson_status = "Статус";
+                    lessons_start_date = "Дата";
+                    lessons_start_time = "Время";
+                    status_canceled  = "Отменен";
+                    status_completed = "Завершен";
+                    status_procesing = "В процесе";
+                    status_watiting  = "Ожидание";
 
 
 
                     button_groups.Text = "Группы";
+                    label_groups_managment.Text = "Управление группами";
+                    button_group_managment_add_menu_add.Text = "Добавить";
+                    button_group_managment_add_menu_cancel.Text = "Отмена";
+                    button_groups_remove.Text = "Удалить";
+                    button_groups_add.Text = "Добавить";
+                    label_group_managment_add_menu_name.Text = "Название";
+                    label_group_managment_add_menu_error.Text = "";
+
+                    button_lessons.Text = "Занятия";
+                    label_lessons_managment.Text = "Управление занятиями";
+                    button_lessons_add.Text = "Добавить";
+                    button_lessons_remove.Text = "Удалить";
+                    label_lessons_managment_add_menu_theme.Text = "Тема";
+                    label_lessons_managment_add_menu_data.Text = "Дата";
+                    label_lessons_add_menu_start.Text = "Начало";
+                    label_lessons_add_menu_end.Text = "Конец";
+                    label_lessons_add_menu_group.Text = "Группа";
+                    label_lessons_add_menu_error.Text = "";
+                    button_lessons_managment_add_menu_add.Text = "Добавить";
+                    button_lessons_managment_add_menu_cancel.Text = "Отмена";
 
                     button_students.Text = "Студенты";
                     label_student_add_menu_first_name.Text = "Имя";
@@ -164,11 +202,20 @@ namespace teacher
             dataGridView_students.Columns[3].Width = 90;
 
             dataGridView_groups.Columns.Add("group_name", group_student);
-            dataGridView_groups.Columns.Add("population", group_students_count);
+            dataGridView_groups.Columns.Add("group_population", group_students_count);
 
-            dataGridView_lessons.Columns.Add("frst", "frst");
-            dataGridView_lessons.Columns.Add("frst", "frst");
-            dataGridView_lessons.Columns.Add("frst", "frst");
+            dataGridView_lessons.Columns.Add("id", "id");
+            dataGridView_lessons.Columns.Add("lessons_theme", lessons_theme);
+            dataGridView_lessons.Columns.Add("lessons_group_id", lessons_group_id);
+            dataGridView_lessons.Columns.Add("lesson_status", lesson_status);
+            dataGridView_lessons.Columns.Add("lessons_start_date", lessons_start_date);
+            dataGridView_lessons.Columns.Add("lessons_start_time", lessons_start_time);
+            dataGridView_lessons.Columns[0].Visible = false;
+            dataGridView_lessons.Columns[1].Width = 177;
+            dataGridView_lessons.Columns[2].Width = 60;
+            dataGridView_lessons.Columns[3].Width = 80;
+            dataGridView_lessons.Columns[4].Width = 70;
+            dataGridView_lessons.Columns[5].Width = 70;
         }
 
         private void hideAllPanels()
@@ -493,9 +540,9 @@ namespace teacher
 
         private async void button_group_managment_add_menu_add_Click(object sender, EventArgs e)
         {
-            if(textBox_group_managment_add_menu_name.Text.Length < 3)
+            if(textBox_group_managment_add_menu_name.Text.Length < 2)
             {
-                showMessage(moreThan, language);
+                label_group_managment_add_menu_error.Text = moreThan;
                 return;
             }
             string name = textBox_group_managment_add_menu_name.Text;
@@ -540,7 +587,7 @@ namespace teacher
             panel_lessons_managment_add_menu.Visible = true;
         }
 
-        private void button_lessons_Click(object sender, EventArgs e)
+        private async void button_lessons_Click(object sender, EventArgs e)
         {
             loadLessons();
             hideAllPanels();
@@ -549,15 +596,44 @@ namespace teacher
             enableButton(button_lessons);
         }
 
+        private string init_status_name(string status)
+        {
+            switch (status)
+            {
+                case "CANCELED":
+                    return status_canceled;
+                case "COMPLETED":
+                    return status_completed;
+                case "PROCESING":
+                    return status_procesing;
+                case "WAITING":
+                    return status_watiting;
+                default:
+                    return status;
+            }
+        }
+
         private async void loadLessons()
         {
-            string answer = await Program.client.SendAsync($"GET_LESSONS");
-            dataGridView_lessons.Rows.Clear();
-            string[] lessons = answer.Split('/');
-            foreach (string this_lesson in lessons)
+            try
             {
-                string[] thisStud = this_lesson.Split('|');
-                dataGridView_students.Rows.Add(thisStud);
+                string answer = await Program.client.SendAsync($"GET_LESSONS");
+                dataGridView_lessons.Rows.Clear();
+                string[] lessons = answer.Split('|');
+                foreach (string this_lesson in lessons)
+                {
+                    string[] thisStud = this_lesson.Split('/');
+                    try
+                    {
+                        thisStud[3] = init_status_name(thisStud[3]);
+                        dataGridView_lessons.Rows.Add(thisStud);
+                    }
+                    catch { }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
             }
         }
 
@@ -603,6 +679,38 @@ namespace teacher
                     showMessage(failedAdding, language);
                     break;
             }
+        }
+
+        private async void button_lessons_remove_Click(object sender, EventArgs e)
+        {
+            if (dataGridView_lessons.SelectedCells.Count > 0)
+            {
+                int selectedIndex = dataGridView_lessons.SelectedCells[0].RowIndex;
+                string index = dataGridView_lessons.Rows[selectedIndex].Cells[0].Value.ToString();
+                string answer = await Program.client.SendAsync($"REMOVE_LESSON|{index}");
+                switch (answer)
+                {
+                    case "SUCCESS":
+                        loadLessons();
+                        showMessage(successRemoving, language);
+                        break;
+                    case "UNEXPECTED_ERROR":
+                        showMessage(failedAdding, language);
+                        break;
+                    case "NOT_FOUND":
+                        showMessage(not_found, language);
+                        break;
+                }
+            }
+            else
+            {
+                showMessage(select_row, language);
+            }
+        }
+
+        private void dataGridView_students_DoubleClick(object sender, EventArgs e)
+        {
+            showMessage("Clicked", language);
         }
     }
 }
