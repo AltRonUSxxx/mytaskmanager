@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
@@ -209,7 +210,7 @@ namespace server
                 user[] allStudents = db.users.Where(x => x.securityLvl_id == 2).Select(x => x).ToArray();
                 foreach(user student in allStudents)
                 {
-                    string temp = $"{getFullName(student.id)}|{student.username}|{getStatus(student.id)}|{ await getGroup_name(Convert.ToInt32(student.group_id))}";
+                    string temp = $"{student.id}|{getFullName(student.id)}|{student.username}|{getStatus(student.id)}|{ await getGroup_name(Convert.ToInt32(student.group_id))}";
                     answer = answer.Append(temp).ToArray();
                 }
                 return answer;
@@ -268,7 +269,7 @@ namespace server
                 group[] allGroups = db.groups.Select(x => x).ToArray();
                 foreach (group this_group in allGroups)
                 {
-                    string temp = $"{this_group.name}|{getGroupPopularity(Convert.ToInt32(this_group.id))}|";
+                    string temp = $"{this_group.id}|{this_group.name}|{getGroupPopularity(Convert.ToInt32(this_group.id))}|";
                     answer = answer.Append(temp).ToArray();
                 }
                 return answer;
@@ -304,19 +305,26 @@ namespace server
             }
         }
 
-        private static string get_lesson_status_name(int status_id)
+        private static string get_lesson_status_name(lesson this_lesson)
         {
             using (var db = new teacher_studentEntities())
             {
-                status this_status = db.status.FirstOrDefault(x => x.id == status_id);
+                status this_status = db.status.FirstOrDefault(x => x.id == this_lesson.status_id);
                 if(this_status == null)
                 {
                     return "-";
                 }
-                else
+                if(this_status.id == 1)
                 {
-                    return this_status.name;
+                    return "CANCELED";
                 }
+                DateTime now = DateTime.Now;
+                if (now < this_lesson.start_time)
+                    return "WAITING";
+                else if (now >= this_lesson.start_time && now <= this_lesson.end_time)
+                    return "PROCESING";
+                else
+                    return "COMPLETED";
             }
         }
 
@@ -330,7 +338,7 @@ namespace server
                     lessons = lessons.Append($"{this_lesson.id}/" +
                         $"{this_lesson.theme}/" +
                         $"{await getGroup_name(this_lesson.group_id)}/" +
-                        $"{get_lesson_status_name(this_lesson.status_id)}/" +
+                        $"{get_lesson_status_name(this_lesson)}/" +
                         $"{this_lesson.start_time.ToString("dd.MM.yyyy/HH:mm")}").ToArray();
                 }
                 return string.Join("|", lessons);
@@ -421,6 +429,21 @@ namespace server
             }
         }
 
+        private static attention get_attention_by_user_id(int id)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                foreach (attention check_attention in db.attentions)
+                {
+                    if(check_attention.user_id == id)
+                    {
+                        return check_attention; 
+                    }
+                }
+                return null;
+            }
+        }
+
         public static async Task<string> get_full_user(string username)
         {
             using (var db = new teacher_studentEntities())
@@ -431,12 +454,15 @@ namespace server
                     try
                     {
                         fullname user_fullname = db.fullnames.FirstOrDefault(x => x.user_id == this_user.id);
+                        attention user_attention = get_attention_by_user_id(this_user.id);
                         string answer = $"SUCCESS|{this_user.username}|" +
                             $"{user_fullname.name}|" +
                             $"{user_fullname.lastname}|" +
                             $"{user_fullname.middlename}|" +
                             $"{this_user.email}|" +
-                            $"{await getGroup_name(Convert.ToInt32(this_user.group_id))}";
+                            $"{await getGroup_name(Convert.ToInt32(this_user.group_id))}|" +
+                            $"{user_attention.isOnline.ToString()}|" +
+                            $"{user_attention.date.Value.ToString("dd.MM.yyyy HH:mm")}";
                         return answer;
                     }
                     catch
@@ -451,16 +477,70 @@ namespace server
             }
         }
 
-        public static async Task<string> redact_user(string username, string password, string password_confirm, string email, string firstname, string lastname, string middlename, string group)
+        public static async Task<string> get_users_id()
         {
             using (var db = new teacher_studentEntities())
             {
-                user this_user = db.users.FirstOrDefault(x => x.username == username);
+                try
+                {
+                    return $"SUCCESS|{string.Join("/",db.users.Select(x => x.id).ToArray())}";
+                }
+                catch
+                {
+                    return "UNEXPECTED_ERROR";
+                }
+            }
+        }
+
+        public static async Task<string> get_user_fio_username_groupId(string id_str)
+        {
+            int id = Convert.ToInt32(id_str);
+            using (var db = new teacher_studentEntities())
+            {
+                user this_user = db.users.FirstOrDefault(x => x.id == id);
                 if(this_user == null)
                 {
                     return "NOT_FOUND";
                 }
-                if(password != "")
+                else
+                {
+                    fullname check_fullname = db.fullnames.FirstOrDefault(x => x.user_id == id);
+                    string fio = (check_fullname != null)
+            ? $"{check_fullname.lastname} {check_fullname.name} {check_fullname.middlename}"
+            : "- - -";
+                    int group_id = this_user.group_id == null ? 1 : Convert.ToInt32(this_user.group_id);
+                    string answer = $"SUCCESS|{this_user.id}|{group_id}|{fio}|{this_user.username}";
+                    return answer;
+                }
+            }
+        }
+
+
+        public static async Task<string> redact_user(string id_str,string username, string password, string password_confirm, string email, string firstname, string lastname, string middlename, string group)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                int id = Convert.ToInt32(id_str);
+                user this_user = db.users.FirstOrDefault(x => x.id == id);
+                if(this_user == null)
+                {
+                    return "NOT_FOUND";
+                }
+                foreach (user check_user in db.users)
+                {
+                    if(check_user.id != this_user.id)
+                    {
+                        if(check_user.username == username)
+                        {
+                            return "USERNAME_ALREADY_TAKEN";
+                        }
+                        else if(check_user.email == email)
+                        {
+                            return "EMAIL_ALREADY_TAKEN";
+                        }
+                    }
+                }
+                if (password != "")
                 {
                     if (passwordHasher.verifyPassword(password_confirm, this_user.hashed_password))
                     {
@@ -470,11 +550,23 @@ namespace server
                     {
                         return "WRONG_PASSWORD";
                     }
-
                 }
+                this_user.username = username;
+                this_user.email = email;
+                foreach(fullname fullname_check in db.fullnames)
+                {
+                    if(fullname_check.user_id == this_user.id)
+                    {
+                        fullname_check.name = firstname;
+                        fullname_check.lastname = lastname;
+                        fullname_check.middlename = middlename;
+                        break;
+                    }
+                }
+                this_user.group_id = await getGroup_id(group);
+                db.SaveChanges();
+                return "SUCCESS";
             }
         }
-
-
     }
 }   

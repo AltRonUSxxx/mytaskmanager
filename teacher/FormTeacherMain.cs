@@ -62,6 +62,9 @@ namespace teacher
         private string new_password;
         private string student_password;
         private string student_password_confirm;
+        private string students_student_id;
+        private string by;
+        private string groups_group_id;
 
 
         public FormTeacherMain(string language_out, string[] alertMessages)
@@ -76,7 +79,13 @@ namespace teacher
             initDataGridView(dataGridView_groups);
             initDataGridView(dataGridView_students);
             initDataGridView(dataGridView_lessons);
+
+            initDataGridView(dataGridView_groups_redact_group_in_group);
+            initDataGridView(dataGridView_groups_redact_group_not_in_group);
             initLanguage(language_out, alertMessages);
+
+            initInOutGrop(dataGridView_groups_redact_group_in_group);
+            initInOutGrop(dataGridView_groups_redact_group_not_in_group);
 
             comboBox_student_add_menu_group.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox_lessons_add_menu_group.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -165,6 +174,9 @@ namespace teacher
                     new_password = "Новый пароль";
                     student_password = "*Пароль";
                     student_password_confirm = "*Потверждение пароля";
+                    students_student_id = "Студент Айди:\n";
+                    by = "с"; // Не в сети С 22:22
+                    groups_group_id = "Групп Айди:\n";
 
 
 
@@ -207,15 +219,18 @@ namespace teacher
                     break;
             }
 
+            dataGridView_students.Columns.Add("id", "id");
             dataGridView_students.Columns.Add("student_fullname", fullname_student);
             dataGridView_students.Columns.Add("student_login", login_student);
             dataGridView_students.Columns.Add("student_status", status_student);
             dataGridView_students.Columns.Add("student_group", group_student);
-            dataGridView_students.Columns[0].Width = 257;
-            dataGridView_students.Columns[1].Width = 110;
-            dataGridView_students.Columns[2].Width = 100;
-            dataGridView_students.Columns[3].Width = 90;
+            dataGridView_students.Columns[0].Visible = false;
+            dataGridView_students.Columns[1].Width = 257;
+            dataGridView_students.Columns[2].Width = 110;
+            dataGridView_students.Columns[3].Width = 100;
+            dataGridView_students.Columns[4].Width = 90;
 
+            dataGridView_groups.Columns.Add("id", "id");
             dataGridView_groups.Columns.Add("group_name", group_student);
             dataGridView_groups.Columns.Add("group_population", group_students_count);
 
@@ -231,6 +246,22 @@ namespace teacher
             dataGridView_lessons.Columns[3].Width = 80;
             dataGridView_lessons.Columns[4].Width = 70;
             dataGridView_lessons.Columns[5].Width = 70;
+
+            
+        }
+
+        private void initInOutGrop(DataGridView gridView)
+        {
+            gridView.Columns.Add("id", "id");
+            gridView.Columns[0].Visible = false;
+            gridView.Columns.Add("id", "id");
+            gridView.Columns[1].Visible = false;
+            gridView.Columns.Add("group_id", "group_id");
+            gridView.Columns[2].Visible = false;
+            gridView.Columns.Add("fullname_student", fullname_student);
+            gridView.Columns.Add("student_login", login_student);
+
+            gridView.Columns[4].Width = 80;
         }
 
         private void hideAllPanels()
@@ -349,8 +380,8 @@ namespace teacher
             foreach (string student in students)
             {
                 string[] thisStud = student.Split('|');
-                thisStud[2] = thisStud[2].Replace("ONLINE", online_student);
-                thisStud[2] = thisStud[2].Replace("OFFLINE", offline_student);
+                thisStud[3] = thisStud[3].Replace("ONLINE", online_student);
+                thisStud[3] = thisStud[3].Replace("OFFLINE", offline_student);
                 dataGridView_students.Rows.Add(thisStud);
             }
         }
@@ -384,11 +415,19 @@ namespace teacher
 
         private void button_student_managment_add_menu_cancel_Click(object sender, EventArgs e)
         {
+            stop_user_redacting();
             panel_students_add_menu.Visible = false;
+
+            textBox_student_add_menu_username.Text = "";
+            textBox_student_add_menu_first_name.Text = "";
+            textBox_student_add_menu_last_name.Text = "";
+            textBox_student_add_menu_middle_name.Text = "";
+            textBox_student_add_menu_email.Text = "";
         }
 
         private async void button_student_managment_add_menu_add_Click(object sender, EventArgs e)
         {
+            label_student_add_menu_error.Text = "";
             string username = textBox_student_add_menu_username.Text;
             string password = textBox_student_add_menu_password.Text;
             string password_confirm = textBox_student_add_menu_password_confirm.Text;
@@ -409,12 +448,13 @@ namespace teacher
                 label_student_add_menu_error.Text = wrongEmail;
                 return;
             }
-            else if (check_validation(password,username) || (isUserRedacting))
+            else if (check_validation(password,username))
             {
                 string answer;
                 if (isUserRedacting)
                 {
-                    answer = await Program.client.SendAsync($"REDACT_USER|{username}|{password}|{password_confirm}|{email}|{firstname}|{lastname}|{middlename}|{group}");
+                    string id = label_students_student_id.Text.Split('\n')[1];
+                    answer = await Program.client.SendAsync($"REDACT_USER|{id}|{username}|{password}|{password_confirm}|{email}|{firstname}|{lastname}|{middlename}|{group}");
                 }
                 else
                 {
@@ -469,12 +509,12 @@ namespace teacher
                 label_student_add_menu_error.Text = NotMoreThan;
                 return false;
             }
-            if (password.Length < 2 || username.Length < 2)
+            if ((!isUserRedacting && password.Length < 2) || username.Length < 2)
             {
                 label_student_add_menu_error.Text = moreThan;
                 return false;
             }
-            if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(username))
+            if ((!isUserRedacting && string.IsNullOrEmpty(password)) || string.IsNullOrEmpty(username))
             {
                 label_student_add_menu_error.Text = fillNeadableText;
                 return false;
@@ -506,7 +546,7 @@ namespace teacher
             if(dataGridView_students.SelectedCells.Count > 0)
             {
                 int selectedIndex = dataGridView_students.SelectedCells[0].RowIndex;
-                string username = dataGridView_students.Rows[selectedIndex].Cells[1].Value.ToString();
+                string username = dataGridView_students.Rows[selectedIndex].Cells[2].Value.ToString();
                 string answer = await Program.client.SendAsync($"REMOVE|{username}");
                 switch(answer)
                 {
@@ -539,7 +579,7 @@ namespace teacher
             if (dataGridView_groups.SelectedCells.Count > 0)
             {
                 int selectedIndex = dataGridView_groups.SelectedCells[0].RowIndex;
-                string username = dataGridView_groups.Rows[selectedIndex].Cells[0].Value.ToString();
+                string username = dataGridView_groups.Rows[selectedIndex].Cells[1].Value.ToString();
                 string answer = await Program.client.SendAsync($"REMOVE_GROUP|{username}");
                 switch (answer)
                 {
@@ -714,8 +754,8 @@ namespace teacher
                 switch (answer)
                 {
                     case "SUCCESS":
-                        loadLessons();
                         showMessage(successRemoving, language);
+                        loadLessons();
                         break;
                     case "UNEXPECTED_ERROR":
                         showMessage(unexpected_error, language);
@@ -734,16 +774,19 @@ namespace teacher
         private async void stop_user_redacting()
         {
             isUserRedacting = false;
-            button_student_managment_add_menu_cancel.Text = student_add;
+            button_student_managment_add_menu_add.Text = student_add;
+            label_students_student_id.Text = students_student_id;
+            label_student_managment_add_menu_satus_time.Visible = false;
+            label_students_student_id.Visible = false;
+            button_student_managment_add_menu_add.Text = student_add;
             label_student_add_menu_password.Text = student_password;
             label_student_add_menu_password_confirm.Text = student_password_confirm;
         }
 
         private async void redact_student(DataGridViewRow row)
         {
-            string username = row.Cells[1].Value.ToString();
+            string username = row.Cells[2].Value.ToString();
             string answer = await Program.client.SendAsync($"GET_FULL_USER|{username}");
-            panel_students_add_menu.Visible = true;
             switch (answer)
             {
                 case "UNEXPECTED_ERROR":
@@ -753,6 +796,11 @@ namespace teacher
                     showMessage(not_found, language);
                     break;
                 default:
+                    button_student_managment_add_menu_add.Text = student_redact;
+                    panel_students_add_menu.Visible = true;
+                    label_students_student_id.Visible = true;
+                    label_student_managment_add_menu_satus_time.Visible=true;
+                    label_students_student_id.Text = students_student_id + row.Cells[0].Value.ToString();
                     isUserRedacting = true;
                     panel_students_add_menu.Visible = true;
                     string[] userdata = answer.Split('|');
@@ -761,6 +809,7 @@ namespace teacher
                     textBox_student_add_menu_last_name.Text = userdata[3];
                     textBox_student_add_menu_middle_name.Text = userdata[4];
                     textBox_student_add_menu_email.Text = userdata[5];
+                    label_student_managment_add_menu_satus_time.Text = $"{userdata[7].Replace("True",online_student).Replace("False",offline_student)} {by} {userdata[8]}";
 
                     textBox_student_add_menu_password.Text = "";
                     textBox_student_add_menu_password_confirm.Text = "";
@@ -772,12 +821,94 @@ namespace teacher
             }
         }
 
-        private void dataGridView_students_DoubleClick(object sender, EventArgs e)
+        private void panel_students_add_menu_VisibleChanged(object sender, EventArgs e)
         {
-            if(dataGridView_students.SelectedRows.Count > 0)
+            if(panel_students_add_menu.Visible)
             {
-                redact_student(dataGridView_students.SelectedRows[0]);
+                label_student_add_menu_error.Text = "";
             }
+        }
+
+        private void dataGridView_students_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (dataGridView_students.SelectedCells.Count > 0)
+            {
+                redact_student(dataGridView_students.Rows[dataGridView_students.SelectedCells[0].RowIndex]);
+            }
+        }
+
+        private void panel_students_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (dataGridView_students.SelectedCells.Count > 0)
+            {
+                dataGridView_students.SelectedCells[0].Selected = false;
+            }
+        }
+
+        private async void load_users_by_id(string[] users_id, int group_id, DataGridView inGroup, DataGridView outGroup)
+        {
+            inGroup.Rows.Clear();
+            outGroup.Rows.Clear();
+            foreach(string user_id in users_id)
+            {
+                string[] answer = (await Program.client.SendAsync($"GET_USER_FIO_USERNAME_GROUPID|{user_id}")).Split('|');
+                if (Convert.ToInt32(answer[2]) == group_id)
+                {
+                    inGroup.Rows.Add(answer);
+                }
+                else
+                {
+                    outGroup.Rows.Add(answer);
+                }
+            }
+
+        }
+
+        private async void redact_group(DataGridViewRow row)
+        {
+            string answer = await Program.client.SendAsync($"GET_USERS_ID");
+            if(answer.StartsWith("UNEXPECTED_ERROR"))
+            {
+                showMessage(unexpected_error, language);
+                return;
+            }
+            else
+            {
+                panel_groups_redact_group.Visible = true;
+                int id = Convert.ToInt32(row.Cells[0].Value.ToString());
+                load_users_by_id(answer.Split('|')[1].Split('/'), id, dataGridView_groups_redact_group_in_group, dataGridView_groups_redact_group_not_in_group);
+                string group_name = row.Cells[1].Value.ToString();
+                textBox_groups_redact_group.Text = group_name;
+                label_groups_redact_group_id.Text = groups_group_id + id;
+            }
+        }
+
+        private void dataGridView_groups_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (dataGridView_groups.SelectedCells.Count > 0)
+            {
+                redact_group(dataGridView_groups.Rows[dataGridView_groups.SelectedCells[0].RowIndex]);
+            }
+        }
+
+        private void stop_group_redact()
+        {
+            panel_groups_redact_group.Visible=false;
+        }
+
+        private void button_groups_redact_group_Click(object sender, EventArgs e)
+        {
+            stop_group_redact();
+        }
+
+        private void button_groups_redact_group_add_Click(object sender, EventArgs e)
+        {
+            if(textBox_groups_redact_group.Text.Length < 3)
+            {
+                showMessage(moreThan, language);
+                return;
+            }
+
         }
     }
 }

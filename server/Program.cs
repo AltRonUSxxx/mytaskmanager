@@ -144,6 +144,24 @@ namespace server
                                 addLogs($"ANSWERS: {result}");
                                 await writer.WriteLineAsync(result);
                                 break;
+                            case "REDACT_USER":
+                                addLogs($"REDACT_USER request [{user_id}]");
+                                result = await AuthService.redact_user(arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8], arguments[9]);
+                                addLogs($"ANSWERS: {result}");
+                                await writer.WriteLineAsync(result);
+                                break;
+                            case "GET_USERS_ID":
+                                addLogs($"GET_USERS_ID request [{user_id}]");
+                                result = await AuthService.get_users_id();
+                                addLogs($"ANSWERS: {result}");
+                                await writer.WriteLineAsync(result);
+                                break;
+                            case "GET_USER_FIO_USERNAME_GROUPID":
+                                addLogs($"GET_USER_FIO_USERNAME_GROUPID request [{user_id}]");
+                                result = await AuthService.get_user_fio_username_groupId(arguments[1]);
+                                addLogs($"ANSWERS: {result}");
+                                await writer.WriteLineAsync(result);
+                                break;
                         }
                     }
                 }
