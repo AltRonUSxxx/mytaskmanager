@@ -37,6 +37,8 @@
             this.button_groups = new System.Windows.Forms.Button();
             this.panel_groups = new System.Windows.Forms.Panel();
             this.panel_groups_redact_group = new System.Windows.Forms.Panel();
+            this.button_groups_redact_group_add = new System.Windows.Forms.Button();
+            this.button_groups_redact_group_cancel = new System.Windows.Forms.Button();
             this.label_groups_redact_group_id = new System.Windows.Forms.Label();
             this.dataGridView_groups_redact_group_not_in_group = new System.Windows.Forms.DataGridView();
             this.dataGridView_groups_redact_group_in_group = new System.Windows.Forms.DataGridView();
@@ -99,8 +101,6 @@
             this.button_lessons_remove = new System.Windows.Forms.Button();
             this.button_lessons_add = new System.Windows.Forms.Button();
             this.dataGridView_lessons = new System.Windows.Forms.DataGridView();
-            this.button_groups_redact_group_cancel = new System.Windows.Forms.Button();
-            this.button_groups_redact_group_add = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_uppestPanel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
@@ -225,6 +225,26 @@
             this.panel_groups_redact_group.TabIndex = 21;
             this.panel_groups_redact_group.Visible = false;
             // 
+            // button_groups_redact_group_add
+            // 
+            this.button_groups_redact_group_add.Location = new System.Drawing.Point(310, 315);
+            this.button_groups_redact_group_add.Name = "button_groups_redact_group_add";
+            this.button_groups_redact_group_add.Size = new System.Drawing.Size(125, 45);
+            this.button_groups_redact_group_add.TabIndex = 26;
+            this.button_groups_redact_group_add.Text = "{add}";
+            this.button_groups_redact_group_add.UseVisualStyleBackColor = true;
+            this.button_groups_redact_group_add.Click += new System.EventHandler(this.button_groups_redact_group_add_Click);
+            // 
+            // button_groups_redact_group_cancel
+            // 
+            this.button_groups_redact_group_cancel.Location = new System.Drawing.Point(441, 315);
+            this.button_groups_redact_group_cancel.Name = "button_groups_redact_group_cancel";
+            this.button_groups_redact_group_cancel.Size = new System.Drawing.Size(125, 45);
+            this.button_groups_redact_group_cancel.TabIndex = 25;
+            this.button_groups_redact_group_cancel.Text = "{cancel}";
+            this.button_groups_redact_group_cancel.UseVisualStyleBackColor = true;
+            this.button_groups_redact_group_cancel.Click += new System.EventHandler(this.button_groups_redact_group_Click);
+            // 
             // label_groups_redact_group_id
             // 
             this.label_groups_redact_group_id.Location = new System.Drawing.Point(429, 0);
@@ -241,6 +261,7 @@
             this.dataGridView_groups_redact_group_not_in_group.Name = "dataGridView_groups_redact_group_not_in_group";
             this.dataGridView_groups_redact_group_not_in_group.Size = new System.Drawing.Size(277, 190);
             this.dataGridView_groups_redact_group_not_in_group.TabIndex = 23;
+            this.dataGridView_groups_redact_group_not_in_group.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_groups_redact_group_not_in_group_CellDoubleClick);
             // 
             // dataGridView_groups_redact_group_in_group
             // 
@@ -249,6 +270,7 @@
             this.dataGridView_groups_redact_group_in_group.Name = "dataGridView_groups_redact_group_in_group";
             this.dataGridView_groups_redact_group_in_group.Size = new System.Drawing.Size(277, 190);
             this.dataGridView_groups_redact_group_in_group.TabIndex = 22;
+            this.dataGridView_groups_redact_group_in_group.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_groups_redact_group_in_group_CellDoubleClick);
             // 
             // label_groups_redact_group
             // 
@@ -840,26 +862,7 @@
             this.dataGridView_lessons.Name = "dataGridView_lessons";
             this.dataGridView_lessons.Size = new System.Drawing.Size(557, 288);
             this.dataGridView_lessons.TabIndex = 0;
-            // 
-            // button_groups_redact_group_cancel
-            // 
-            this.button_groups_redact_group_cancel.Location = new System.Drawing.Point(441, 315);
-            this.button_groups_redact_group_cancel.Name = "button_groups_redact_group_cancel";
-            this.button_groups_redact_group_cancel.Size = new System.Drawing.Size(125, 45);
-            this.button_groups_redact_group_cancel.TabIndex = 25;
-            this.button_groups_redact_group_cancel.Text = "{cancel}";
-            this.button_groups_redact_group_cancel.UseVisualStyleBackColor = true;
-            this.button_groups_redact_group_cancel.Click += new System.EventHandler(this.button_groups_redact_group_Click);
-            // 
-            // button_groups_redact_group_add
-            // 
-            this.button_groups_redact_group_add.Location = new System.Drawing.Point(310, 315);
-            this.button_groups_redact_group_add.Name = "button_groups_redact_group_add";
-            this.button_groups_redact_group_add.Size = new System.Drawing.Size(125, 45);
-            this.button_groups_redact_group_add.TabIndex = 26;
-            this.button_groups_redact_group_add.Text = "{add}";
-            this.button_groups_redact_group_add.UseVisualStyleBackColor = true;
-            this.button_groups_redact_group_add.Click += new System.EventHandler(this.button_groups_redact_group_add_Click);
+            this.dataGridView_lessons.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_lessons_CellDoubleClick);
             // 
             // FormTeacherMain
             // 
@@ -875,9 +878,9 @@
             this.Controls.Add(this.pictureBox_uppestPanel);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.panel_lessons);
             this.Controls.Add(this.panel_groups);
             this.Controls.Add(this.panel_students);
-            this.Controls.Add(this.panel_lessons);
             this.Font = new System.Drawing.Font("Arial", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(6);

@@ -19,8 +19,10 @@ namespace teacher
     public partial class FormTeacherMain : Form
     {
         private string language;
+        private string[] idToReverse;
 
         private bool isUserRedacting;
+        private bool isLessonRedacting;
 
         private string allarmCloseText;
         private string fillNeadableText;
@@ -67,13 +69,16 @@ namespace teacher
         private string groups_group_id;
 
 
+
         public FormTeacherMain(string language_out, string[] alertMessages)
         {
             this.DoubleBuffered = true;
             InitializeComponent();
             panel_students.Visible = false;
             label_student_add_menu_error.Text = "";
+            idToReverse = new string[0];
             isUserRedacting = false;
+            isLessonRedacting = false;
             makeSquareCorner();
             language = language_out;
             initDataGridView(dataGridView_groups);
@@ -252,7 +257,7 @@ namespace teacher
 
         private void initInOutGrop(DataGridView gridView)
         {
-            gridView.Columns.Add("id", "id");
+            gridView.Columns.Add("JUST", "JUST");
             gridView.Columns[0].Visible = false;
             gridView.Columns.Add("id", "id");
             gridView.Columns[1].Visible = false;
@@ -411,6 +416,11 @@ namespace teacher
         private void button_students_add_Click(object sender, EventArgs e)
         {
             panel_students_add_menu.Visible = true;
+            label_students_student_id.Visible = false;
+            if(!isUserRedacting)
+            {
+                label_student_managment_add_menu_satus_time.Visible = false;
+            }
         }
 
         private void button_student_managment_add_menu_cancel_Click(object sender, EventArgs e)
@@ -899,16 +909,67 @@ namespace teacher
         private void button_groups_redact_group_Click(object sender, EventArgs e)
         {
             stop_group_redact();
+            idToReverse = new string[0];
         }
 
-        private void button_groups_redact_group_add_Click(object sender, EventArgs e)
+        private async void button_groups_redact_group_add_Click(object sender, EventArgs e)
         {
             if(textBox_groups_redact_group.Text.Length < 3)
             {
                 showMessage(moreThan, language);
                 return;
             }
+            string answer = await Program.client.SendAsync($"REVERSE_GROUP_ID|{label_groups_redact_group_id.Text.Split('\n')[1]}|1|{string.Join("/",idToReverse)}");
+            showMessage(answer, language);   
+        }
 
+        private void toReverse(string id)
+        {
+            if(idToReverse.Contains(id))
+            {
+                idToReverse = idToReverse.Where(x => x != id).ToArray();
+            }
+            else
+            {
+                idToReverse = idToReverse.Append(id).ToArray();
+            }
+        }
+
+        private void dataGridView_groups_redact_group_in_group_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (dataGridView_groups_redact_group_in_group.SelectedCells.Count > 0)
+            {
+                DataGridViewRow row = dataGridView_groups_redact_group_in_group.Rows[e.RowIndex];
+                dataGridView_groups_redact_group_in_group.Rows.Remove(row);
+                dataGridView_groups_redact_group_not_in_group.Rows.Add(row);
+                toReverse(row.Cells[1].Value.ToString());
+            }
+        }
+
+        private void dataGridView_groups_redact_group_not_in_group_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (dataGridView_groups_redact_group_not_in_group.SelectedCells.Count > 0)
+            {
+                DataGridViewRow row = dataGridView_groups_redact_group_not_in_group.Rows[e.RowIndex];
+                dataGridView_groups_redact_group_not_in_group.Rows.Remove(row);
+                dataGridView_groups_redact_group_in_group.Rows.Add(row);
+                toReverse(row.Cells[1].Value.ToString());
+            }
+        }
+
+        private void redact_lesson(DataGridViewRow row)
+        {
+            panel_lessons_managment_add_menu.Visible = true;
+            isLessonRedacting = true;
+        }
+
+        private void dataGridView_lessons_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if(!(dataGridView_lessons.SelectedCells.Count > 0))
+            {
+                return;
+            }
+            redact_lesson(dataGridView_lessons.Rows[e.RowIndex]);
         }
     }
 }

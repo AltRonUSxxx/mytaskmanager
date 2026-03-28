@@ -162,6 +162,12 @@ namespace server
                                 addLogs($"ANSWERS: {result}");
                                 await writer.WriteLineAsync(result);
                                 break;
+                            case "REVERSE_GROUP_ID":
+                                addLogs($"REVERSE_GROUP_ID request [{user_id}]");
+                                result = await AuthService.reverse_group_id(Convert.ToInt32(arguments[1]), Convert.ToInt32(arguments[2]), arguments[3].Split('/'));
+                                addLogs($"ANSWERS: {result}");
+                                await writer.WriteLineAsync(result);
+                                break;
                         }
                     }
                 }

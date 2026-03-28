@@ -234,6 +234,10 @@ namespace server
                 {
                     try
                     {
+                        if(this_group.id == 1)
+                        {
+                            return "UNEXPECTED_ERROR";
+                        }
                         var students = db.users.Where(u => u.group_id == this_group.id).ToList();
                         foreach (user student in students)
                         {
@@ -492,6 +496,39 @@ namespace server
             }
         }
 
+        public static async Task<string> reverse_group_id(int first_group_id, int second_group_id, string[] users_id)
+        {
+            using (var db = new teacher_studentEntities())
+            {
+                try
+                {
+                    foreach (string user_id_str in users_id)
+                    {
+                        int user_id = Convert.ToInt32(user_id_str);
+                        user this_user = db.users.FirstOrDefault(x => x.id == user_id);
+                        if(this_user != null)
+                        {
+                            if(this_user.group_id == first_group_id)
+                            {
+                                this_user.group_id = second_group_id;
+                            }
+                            else
+                            {
+                                this_user.group_id = first_group_id;
+                            }
+                        }
+                    }
+                    db.SaveChanges();
+                    return "SUCCESS";
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    return "UNEXPECTED_ERROR";
+                }
+            }
+        }
+
         public static async Task<string> get_user_fio_username_groupId(string id_str)
         {
             int id = Convert.ToInt32(id_str);
@@ -506,8 +543,8 @@ namespace server
                 {
                     fullname check_fullname = db.fullnames.FirstOrDefault(x => x.user_id == id);
                     string fio = (check_fullname != null)
-            ? $"{check_fullname.lastname} {check_fullname.name} {check_fullname.middlename}"
-            : "- - -";
+                    ? $"{check_fullname.lastname} {check_fullname.name} {check_fullname.middlename}"
+                    : "- - -";
                     int group_id = this_user.group_id == null ? 1 : Convert.ToInt32(this_user.group_id);
                     string answer = $"SUCCESS|{this_user.id}|{group_id}|{fio}|{this_user.username}";
                     return answer;
