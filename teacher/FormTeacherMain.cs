@@ -186,11 +186,12 @@ namespace teacher
                     by = "by"; // Не в сети С 22:22
                     groups_group_id = "Group id:\n";
 
+
                     button_veyon.Text = "Veyon";
                     label_veyon_managment.Text = "Veyon managment";
                     label_groups_redact_group.Text = "*Name";
                     button_groups_redact_group_add.Text = "Add";
-                    button_groups_redact_group_cancel.Text = "Cancele";
+                    button_groups_redact_group_cancel.Text = "Cancel";
 
 
                     button_groups.Text = "Groups";
